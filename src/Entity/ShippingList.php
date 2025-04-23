@@ -72,7 +72,7 @@ class ShippingList
      * 当分拆发货（多个物流单）时，需填入各物流单关联的商品列表
      * 多重性: [0, 50]
      */
-    #[ORM\OneToMany(mappedBy: 'shippingList', targetEntity: ShippingItemList::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: ShippingItemList::class, mappedBy: 'shippingList', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $itemList;
 
     /**

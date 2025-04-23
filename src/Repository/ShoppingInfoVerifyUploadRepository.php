@@ -4,7 +4,6 @@ namespace WechatMiniProgramOrderBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use DoctrineEnhanceBundle\Repository\CommonRepositoryAware;
 use WechatMiniProgramOrderBundle\Entity\ShoppingInfoVerifyUpload;
 use WechatMiniProgramOrderBundle\Enum\ShoppingInfoVerifyStatus;
 
@@ -16,8 +15,6 @@ use WechatMiniProgramOrderBundle\Enum\ShoppingInfoVerifyStatus;
  */
 class ShoppingInfoVerifyUploadRepository extends ServiceEntityRepository
 {
-    use CommonRepositoryAware;
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, ShoppingInfoVerifyUpload::class);

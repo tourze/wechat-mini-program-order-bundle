@@ -4,7 +4,6 @@ namespace WechatMiniProgramOrderBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use DoctrineEnhanceBundle\Repository\CommonRepositoryAware;
 use WechatMiniProgramOrderBundle\Entity\ShippingInfo;
 
 /**
@@ -15,8 +14,6 @@ use WechatMiniProgramOrderBundle\Entity\ShippingInfo;
  */
 class ShippingInfoRepository extends ServiceEntityRepository
 {
-    use CommonRepositoryAware;
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, ShippingInfo::class);

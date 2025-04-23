@@ -4,7 +4,6 @@ namespace WechatMiniProgramOrderBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use DoctrineEnhanceBundle\Repository\CommonRepositoryAware;
 use WechatMiniProgramOrderBundle\Entity\SubOrderList;
 use WechatMiniProgramOrderBundle\Enum\DeliveryMode;
 
@@ -16,8 +15,6 @@ use WechatMiniProgramOrderBundle\Enum\DeliveryMode;
  */
 class SubOrderListRepository extends ServiceEntityRepository
 {
-    use CommonRepositoryAware;
-
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, SubOrderList::class);
