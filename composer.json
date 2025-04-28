@@ -18,6 +18,7 @@
     "tourze/doctrine-indexed-bundle": "0.0.*",
     "tourze/doctrine-user-bundle": "0.0.*",
     "tourze/doctrine-snowflake-bundle": "0.0.*",
+    "tourze/wechat-mini-program-bundle": "0.0.*",
     "symfony/yaml": "^6.4 || ^7.1",
     "tourze/doctrine-track-bundle": "0.0.*"
   },
