@@ -16,8 +16,8 @@ use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
 use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
+use Tourze\WechatMiniProgramUserContracts\UserInterface;
 use WechatMiniProgramBundle\Entity\Account;
-use WechatMiniProgramBundle\Entity\User;
 use WechatMiniProgramOrderBundle\Enum\LogisticsType;
 use WechatMiniProgramOrderBundle\Repository\ShippingInfoRepository;
 
@@ -69,9 +69,9 @@ class ShippingInfo
     /**
      * 必填，支付者信息
      */
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(targetEntity: UserInterface::class)]
     #[ORM\JoinColumn(nullable: false, options: ['comment' => '支付者信息'])]
-    private User $payer;
+    private UserInterface $payer;
 
     /**
      * 必填，物流形式
@@ -183,12 +183,12 @@ class ShippingInfo
         return $this;
     }
 
-    public function getPayer(): User
+    public function getPayer(): UserInterface
     {
         return $this->payer;
     }
 
-    public function setPayer(User $payer): self
+    public function setPayer(UserInterface $payer): self
     {
         $this->payer = $payer;
 

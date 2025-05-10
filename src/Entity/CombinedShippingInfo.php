@@ -18,8 +18,8 @@ use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
 use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
+use Tourze\WechatMiniProgramUserContracts\UserInterface;
 use WechatMiniProgramBundle\Entity\Account;
-use WechatMiniProgramBundle\Entity\User;
 use WechatMiniProgramOrderBundle\Repository\CombinedShippingInfoRepository;
 
 /**
@@ -54,7 +54,7 @@ class CombinedShippingInfo
     /**
      * 子单物流详情列表
      */
-    #[ORM\OneToMany(mappedBy: 'combinedShippingInfo', targetEntity: SubOrderList::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: SubOrderList::class, mappedBy: 'combinedShippingInfo', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $subOrders;
 
     /**
@@ -62,7 +62,7 @@ class CombinedShippingInfo
      */
     #[ORM\OneToOne(cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false, options: ['comment' => '支付者信息'])]
-    private ?User $payer = null;
+    private ?UserInterface $payer = null;
 
     /**
      * 必填，上传时间，用于标识请求的先后顺序
@@ -165,12 +165,12 @@ class CombinedShippingInfo
         return $this;
     }
 
-    public function getPayer(): ?User
+    public function getPayer(): ?UserInterface
     {
         return $this->payer;
     }
 
-    public function setPayer(?User $payer): self
+    public function setPayer(?UserInterface $payer): self
     {
         $this->payer = $payer;
 

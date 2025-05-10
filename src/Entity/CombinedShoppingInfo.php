@@ -13,8 +13,8 @@ use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
 use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
 use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use Tourze\EasyAdmin\Attribute\Filter\Filterable;
+use Tourze\WechatMiniProgramUserContracts\UserInterface;
 use WechatMiniProgramBundle\Entity\Account;
-use WechatMiniProgramBundle\Entity\User;
 use WechatMiniProgramOrderBundle\Repository\CombinedShoppingInfoRepository;
 
 /**
@@ -72,7 +72,7 @@ class CombinedShoppingInfo
     private ?int $freightAmount = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?User $payer = null;
+    private ?UserInterface $payer = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Contact $contact = null;
@@ -232,12 +232,12 @@ class CombinedShoppingInfo
         return $this;
     }
 
-    public function getPayer(): ?User
+    public function getPayer(): ?UserInterface
     {
         return $this->payer;
     }
 
-    public function setPayer(?User $payer): self
+    public function setPayer(?UserInterface $payer): self
     {
         $this->payer = $payer;
 
