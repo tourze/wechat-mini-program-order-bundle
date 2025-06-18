@@ -72,7 +72,7 @@ class OrderKeyTest extends TestCase
     {
         $this->assertNull($this->orderKey->getCreateTime());
         
-        $createTime = new \DateTime();
+        $createTime = new \DateTimeImmutable();
         $this->orderKey->setCreateTime($createTime);
         $this->assertSame($createTime, $this->orderKey->getCreateTime());
     }
@@ -81,7 +81,7 @@ class OrderKeyTest extends TestCase
     {
         $this->assertNull($this->orderKey->getUpdateTime());
         
-        $updateTime = new \DateTime();
+        $updateTime = new \DateTimeImmutable();
         $this->orderKey->setUpdateTime($updateTime);
         $this->assertSame($updateTime, $this->orderKey->getUpdateTime());
     }

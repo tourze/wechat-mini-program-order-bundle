@@ -4,12 +4,11 @@ namespace WechatMiniProgramOrderBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use Tourze\WechatMiniProgramUserContracts\UserInterface;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramOrderBundle\Repository\CombinedShoppingInfoRepository;
@@ -19,11 +18,9 @@ use WechatMiniProgramOrderBundle\Repository\CombinedShoppingInfoRepository;
  */
 #[ORM\Entity(repositoryClass: CombinedShoppingInfoRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_combined_shopping_info', options: ['comment' => '合单购物信息表'])]
-class CombinedShoppingInfo
+class CombinedShoppingInfo implements Stringable
 {
     use TimestampableAware;
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
@@ -31,11 +28,9 @@ class CombinedShoppingInfo
     private ?string $id = null;
 
     #[CreatedByColumn]
-    #[ORM\Column(nullable: true, options: ['comment' => '创建人'])]
     private ?string $createdBy = null;
 
     #[UpdatedByColumn]
-    #[ORM\Column(nullable: true, options: ['comment' => '更新人'])]
     private ?string $updatedBy = null;
 
     /**
@@ -45,28 +40,28 @@ class CombinedShoppingInfo
     #[ORM\JoinColumn(nullable: false, options: ['comment' => '小程序账号'])]
     private Account $account;
 
-    #[ORM\Column(length: 64)]
+#[ORM\Column(length: 64, options: ['comment' => '字段说明'])]
     private ?string $orderId = null;
 
-    #[ORM\Column(length: 64)]
+#[ORM\Column(length: 64, options: ['comment' => '字段说明'])]
     private ?string $outOrderId = null;
 
-    #[ORM\Column(length: 64)]
+#[ORM\Column(length: 64, options: ['comment' => '字段说明'])]
     private ?string $pathId = null;
 
-    #[ORM\Column(length: 32)]
+#[ORM\Column(length: 32, options: ['comment' => '字段说明'])]
     private ?string $status = null;
 
-    #[ORM\Column(type: 'integer')]
+#[ORM\Column(type: 'integer', options: ['comment' => '字段说明'])]
     private ?int $totalAmount = null;
 
-    #[ORM\Column(type: 'integer')]
+#[ORM\Column(type: 'integer', options: ['comment' => '字段说明'])]
     private ?int $payAmount = null;
 
-    #[ORM\Column(type: 'integer')]
+#[ORM\Column(type: 'integer', options: ['comment' => '字段说明'])]
     private ?int $discountAmount = null;
 
-    #[ORM\Column(type: 'integer')]
+#[ORM\Column(type: 'integer', options: ['comment' => '字段说明'])]
     private ?int $freightAmount = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
@@ -249,4 +244,9 @@ class CombinedShoppingInfo
         $this->shippingInfo = $shippingInfo;
 
         return $this;
-    }}
+    }
+    public function __toString(): string
+    {
+        return (string) $this->id;
+    }
+}

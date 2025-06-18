@@ -2,6 +2,12 @@
 
 namespace WechatMiniProgramOrderBundle\Enum;
 
+use Tourze\EnumExtra\Itemable;
+use Tourze\EnumExtra\ItemTrait;
+use Tourze\EnumExtra\Labelable;
+use Tourze\EnumExtra\Selectable;
+use Tourze\EnumExtra\SelectTrait;
+
 /**
  * 物流形式枚举
  * 1. PHYSICAL_LOGISTICS - 实体物流配送采用快递公司进行实体物流配送形式
@@ -10,8 +16,11 @@ namespace WechatMiniProgramOrderBundle\Enum;
  * 4. SELF_PICKUP - 用户自提
  */
 enum LogisticsType: int
-{
-    /**
+ implements Itemable, Labelable, Selectable{
+    
+    use ItemTrait;
+    use SelectTrait;
+/**
      * 实体物流配送
      */
     case PHYSICAL_LOGISTICS = 1;
@@ -30,4 +39,12 @@ enum LogisticsType: int
      * 用户自提
      */
     case SELF_PICKUP = 4;
+
+    public function getLabel(): string
+    {
+        return match($this) {
+            // TODO: 添加具体的标签映射
+            default => $this->name,
+        };
+    }
 }

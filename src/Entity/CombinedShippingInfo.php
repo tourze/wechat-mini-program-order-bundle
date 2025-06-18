@@ -6,16 +6,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
+use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
-use Tourze\EasyAdmin\Attribute\Column\BoolColumn;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Field\FormField;
 use Tourze\WechatMiniProgramUserContracts\UserInterface;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramOrderBundle\Repository\CombinedShippingInfoRepository;
@@ -25,11 +21,9 @@ use WechatMiniProgramOrderBundle\Repository\CombinedShippingInfoRepository;
  */
 #[ORM\Entity(repositoryClass: CombinedShippingInfoRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_combined_shipping_info', options: ['comment' => '合单物流信息表'])]
-class CombinedShippingInfo
+class CombinedShippingInfo implements Stringable
 {
     use TimestampableAware;
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
@@ -69,20 +63,13 @@ class CombinedShippingInfo
     #[ORM\Column(type: 'datetime_immutable', options: ['comment' => '上传时间，用于标识请求的先后顺序'])]
     private \DateTimeImmutable $uploadTime;
 
-    #[BoolColumn]
-    #[IndexColumn]
     #[TrackColumn]
-    #[ORM\Column(type: Types::BOOLEAN, nullable: true, options: ['comment' => '有效', 'default' => 0])]
-    #[ListColumn(order: 97)]
-    #[FormField(order: 97)]
     private ?bool $valid = false;
 
     #[CreatedByColumn]
-    #[ORM\Column(nullable: true, options: ['comment' => '创建人'])]
     private ?string $createdBy = null;
 
     #[UpdatedByColumn]
-    #[ORM\Column(nullable: true, options: ['comment' => '更新人'])]
     private ?string $updatedBy = null;
 
     public function __construct()
@@ -207,4 +194,9 @@ class CombinedShippingInfo
     public function getUpdatedBy(): ?string
     {
         return $this->updatedBy;
-    }}
+    }
+    public function __toString(): string
+    {
+        return (string) $this->id;
+    }
+}

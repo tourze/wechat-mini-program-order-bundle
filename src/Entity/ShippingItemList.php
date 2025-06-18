@@ -4,12 +4,11 @@ namespace WechatMiniProgramOrderBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use WechatMiniProgramOrderBundle\Repository\ShippingItemListRepository;
 
 /**
@@ -17,11 +16,9 @@ use WechatMiniProgramOrderBundle\Repository\ShippingItemListRepository;
  */
 #[ORM\Entity(repositoryClass: ShippingItemListRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_shipping_item_list', options: ['comment' => '物流商品列表项'])]
-class ShippingItemList
+class ShippingItemList implements Stringable
 {
     use TimestampableAware;
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
@@ -29,11 +26,9 @@ class ShippingItemList
     private ?string $id = null;
 
     #[CreatedByColumn]
-    #[ORM\Column(nullable: true, options: ['comment' => '创建人'])]
     private ?string $createdBy = null;
 
     #[UpdatedByColumn]
-    #[ORM\Column(nullable: true, options: ['comment' => '更新人'])]
     private ?string $updatedBy = null;
 
     /**
@@ -102,4 +97,9 @@ class ShippingItemList
         $this->merchantItemId = $merchantItemId;
 
         return $this;
-    }}
+    }
+    public function __toString(): string
+    {
+        return (string) $this->id;
+    }
+}

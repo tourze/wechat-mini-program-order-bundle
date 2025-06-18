@@ -83,8 +83,6 @@ class UploadShoppingInfoRequestTest extends TestCase
     public function testGetRequestOptions(): void
     {
         $options = $this->request->getRequestOptions();
-        
-        $this->assertIsArray($options);
         $this->assertArrayHasKey('json', $options);
         
         $json = $options['json'];

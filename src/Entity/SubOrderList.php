@@ -6,12 +6,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
 use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
 use WechatMiniProgramOrderBundle\Enum\DeliveryMode;
 use WechatMiniProgramOrderBundle\Repository\SubOrderListRepository;
 
@@ -20,11 +19,9 @@ use WechatMiniProgramOrderBundle\Repository\SubOrderListRepository;
  */
 #[ORM\Entity(repositoryClass: SubOrderListRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_sub_order_list', options: ['comment' => '子单物流详情表'])]
-class SubOrderList
+class SubOrderList implements Stringable
 {
     use TimestampableAware;
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
@@ -32,11 +29,9 @@ class SubOrderList
     private ?string $id = null;
 
     #[CreatedByColumn]
-    #[ORM\Column(nullable: true, options: ['comment' => '创建人'])]
     private ?string $createdBy = null;
 
     #[UpdatedByColumn]
-    #[ORM\Column(nullable: true, options: ['comment' => '更新人'])]
     private ?string $updatedBy = null;
 
     /**
@@ -165,4 +160,9 @@ class SubOrderList
         }
 
         return $this;
-    }}
+    }
+    public function __toString(): string
+    {
+        return (string) $this->id;
+    }
+}

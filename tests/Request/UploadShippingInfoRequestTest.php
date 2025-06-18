@@ -63,8 +63,6 @@ class UploadShippingInfoRequestTest extends TestCase
     public function testGetRequestOptions(): void
     {
         $options = $this->request->getRequestOptions();
-        
-        $this->assertIsArray($options);
         $this->assertArrayHasKey('json', $options);
         
         $json = $options['json'];
@@ -82,7 +80,6 @@ class UploadShippingInfoRequestTest extends TestCase
         
         // 验证物流清单
         $this->assertArrayHasKey('shipping_list', $json);
-        $this->assertIsArray($json['shipping_list']);
         $this->assertCount(1, $json['shipping_list']);
         
         $shipping = $json['shipping_list'][0];
