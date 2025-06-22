@@ -7,8 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
+use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use Tourze\WechatMiniProgramUserContracts\UserInterface;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramOrderBundle\Repository\CombinedShoppingInfoRepository;
@@ -21,17 +20,12 @@ use WechatMiniProgramOrderBundle\Repository\CombinedShoppingInfoRepository;
 class CombinedShoppingInfo implements Stringable
 {
     use TimestampableAware;
+    use BlameableAware;
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
-
-    #[CreatedByColumn]
-    private ?string $createdBy = null;
-
-    #[UpdatedByColumn]
-    private ?string $updatedBy = null;
 
     /**
      * 必填，小程序账号
@@ -52,16 +46,16 @@ class CombinedShoppingInfo implements Stringable
 #[ORM\Column(length: 32, options: ['comment' => '字段说明'])]
     private ?string $status = null;
 
-#[ORM\Column(type: 'integer', options: ['comment' => '字段说明'])]
+#[ORM\Column(type: Types::INTEGER, options: ['comment' => '字段说明'])]
     private ?int $totalAmount = null;
 
-#[ORM\Column(type: 'integer', options: ['comment' => '字段说明'])]
+#[ORM\Column(type: Types::INTEGER, options: ['comment' => '字段说明'])]
     private ?int $payAmount = null;
 
-#[ORM\Column(type: 'integer', options: ['comment' => '字段说明'])]
+#[ORM\Column(type: Types::INTEGER, options: ['comment' => '字段说明'])]
     private ?int $discountAmount = null;
 
-#[ORM\Column(type: 'integer', options: ['comment' => '字段说明'])]
+#[ORM\Column(type: Types::INTEGER, options: ['comment' => '字段说明'])]
     private ?int $freightAmount = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
@@ -76,30 +70,6 @@ class CombinedShoppingInfo implements Stringable
     public function getId(): ?string
     {
         return $this->id;
-    }
-
-    public function setCreatedBy(?string $createdBy): self
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?string
-    {
-        return $this->createdBy;
-    }
-
-    public function setUpdatedBy(?string $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getUpdatedBy(): ?string
-    {
-        return $this->updatedBy;
     }
 
     public function getAccount(): Account

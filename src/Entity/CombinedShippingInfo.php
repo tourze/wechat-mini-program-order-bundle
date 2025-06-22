@@ -10,8 +10,7 @@ use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
+use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use Tourze\WechatMiniProgramUserContracts\UserInterface;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramOrderBundle\Repository\CombinedShippingInfoRepository;
@@ -24,6 +23,7 @@ use WechatMiniProgramOrderBundle\Repository\CombinedShippingInfoRepository;
 class CombinedShippingInfo implements Stringable
 {
     use TimestampableAware;
+    use BlameableAware;
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
@@ -57,20 +57,11 @@ class CombinedShippingInfo implements Stringable
     #[ORM\JoinColumn(nullable: false, options: ['comment' => '支付者信息'])]
     private ?UserInterface $payer = null;
 
-    /**
-     * 必填，上传时间，用于标识请求的先后顺序
-     */
-    #[ORM\Column(type: 'datetime_immutable', options: ['comment' => '上传时间，用于标识请求的先后顺序'])]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '上传时间，用于标识请求的先后顺序'])]
     private \DateTimeImmutable $uploadTime;
 
     #[TrackColumn]
     private ?bool $valid = false;
-
-    #[CreatedByColumn]
-    private ?string $createdBy = null;
-
-    #[UpdatedByColumn]
-    private ?string $updatedBy = null;
 
     public function __construct()
     {
@@ -172,29 +163,6 @@ class CombinedShippingInfo implements Stringable
         return $this;
     }
 
-    public function setCreatedBy(?string $createdBy): self
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?string
-    {
-        return $this->createdBy;
-    }
-
-    public function setUpdatedBy(?string $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getUpdatedBy(): ?string
-    {
-        return $this->updatedBy;
-    }
     public function __toString(): string
     {
         return (string) $this->id;

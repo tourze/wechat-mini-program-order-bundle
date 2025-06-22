@@ -7,8 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
+use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use WechatMiniProgramOrderBundle\Enum\ShoppingInfoVerifyStatus;
 use WechatMiniProgramOrderBundle\Repository\ShoppingInfoVerifyUploadRepository;
 
@@ -17,63 +16,35 @@ use WechatMiniProgramOrderBundle\Repository\ShoppingInfoVerifyUploadRepository;
 class ShoppingInfoVerifyUpload implements Stringable
 {
     use TimestampableAware;
+    use BlameableAware;
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[CreatedByColumn]
-    private ?string $createdBy = null;
 
-    #[UpdatedByColumn]
-    private ?string $updatedBy = null;
-
-    #[ORM\Column(length: 64, options: ['comment' => '订单ID'])]
+    #[ORM\Column(type: Types::STRING, length: 64, options: ['comment' => '订单ID'])]
     private ?string $orderId = null;
 
-    #[ORM\Column(length: 64, options: ['comment' => '商户订单ID'])]
+    #[ORM\Column(type: Types::STRING, length: 64, options: ['comment' => '商户订单ID'])]
     private ?string $outOrderId = null;
 
-    #[ORM\Column(length: 64, options: ['comment' => '路径ID'])]
+    #[ORM\Column(type: Types::STRING, length: 64, options: ['comment' => '路径ID'])]
     private ?string $pathId = null;
 
-    #[ORM\Column(type: 'string', enumType: ShoppingInfoVerifyStatus::class, options: ['comment' => '验证状态'])]
+    #[ORM\Column(type: Types::STRING, enumType: ShoppingInfoVerifyStatus::class, options: ['comment' => '验证状态'])]
     private ShoppingInfoVerifyStatus $status = ShoppingInfoVerifyStatus::PENDING;
 
-    #[ORM\Column(type: 'text', nullable: true, options: ['comment' => '验证失败原因'])]
+    #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '验证失败原因'])]
     private ?string $failReason = null;
 
-    #[ORM\Column(type: 'json', nullable: true, options: ['comment' => '验证结果数据'])]
+    #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '验证结果数据'])]
     private ?array $resultData = null;
 
     public function getId(): ?string
     {
         return $this->id;
-    }
-
-    public function setCreatedBy(?string $createdBy): self
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?string
-    {
-        return $this->createdBy;
-    }
-
-    public function setUpdatedBy(?string $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getUpdatedBy(): ?string
-    {
-        return $this->updatedBy;
     }
 
     public function getOrderId(): ?string

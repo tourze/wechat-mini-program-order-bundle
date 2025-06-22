@@ -7,8 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
+use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use WechatMiniProgramOrderBundle\Enum\OrderNumberType;
 use WechatMiniProgramOrderBundle\Repository\OrderKeyRepository;
 
@@ -20,74 +19,29 @@ use WechatMiniProgramOrderBundle\Repository\OrderKeyRepository;
 class OrderKey implements Stringable
 {
     use TimestampableAware;
+    use BlameableAware;
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[CreatedByColumn]
-    private ?string $createdBy = null;
 
-    #[UpdatedByColumn]
-    private ?string $updatedBy = null;
-
-    /**
-     * 必填，订单单号类型
-     * 用于确认需要上传详情的订单
-     * 枚举值：
-     * 1. USE_MCH_ORDER - 使用下单商户号和商户侧单号
-     * 2. USE_WECHAT_ORDER - 使用微信支付单号
-     */
-    #[ORM\Column(type: 'integer', enumType: OrderNumberType::class, options: ['comment' => '订单单号类型：1-使用商户单号，2-使用微信单号'])]
+    #[ORM\Column(type: Types::INTEGER, enumType: OrderNumberType::class, options: ['comment' => '订单单号类型：1-使用商户单号，2-使用微信单号'])]
     private OrderNumberType $orderNumberType = OrderNumberType::USE_MCH_ORDER;
 
-    /**
-     * 原支付交易对应的微信订单号
-     */
-    #[ORM\Column(length: 64, nullable: true, options: ['comment' => '原支付交易对应的微信订单号'])]
+    #[ORM\Column(type: Types::STRING, length: 64, nullable: true, options: ['comment' => '原支付交易对应的微信订单号'])]
     private ?string $transactionId = null;
 
-    /**
-     * 支付下单商户的商户号，由微信支付生成并下发
-     */
-    #[ORM\Column(length: 64, nullable: true, options: ['comment' => '支付下单商户的商户号'])]
+    #[ORM\Column(type: Types::STRING, length: 64, nullable: true, options: ['comment' => '支付下单商户的商户号'])]
     private ?string $mchId = null;
 
-    /**
-     * 商户系统内部订单号
-     * 只能是数字、大小写字母`_-*`且在同一个商户号下唯一
-     */
-    #[ORM\Column(length: 64, nullable: true, options: ['comment' => '商户系统内部订单号'])]
+    #[ORM\Column(type: Types::STRING, length: 64, nullable: true, options: ['comment' => '商户系统内部订单号'])]
     private ?string $outTradeNo = null;
 
     public function getId(): ?string
     {
         return $this->id;
-    }
-
-    public function setCreatedBy(?string $createdBy): self
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?string
-    {
-        return $this->createdBy;
-    }
-
-    public function setUpdatedBy(?string $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getUpdatedBy(): ?string
-    {
-        return $this->updatedBy;
     }
 
     public function getOrderNumberType(): OrderNumberType

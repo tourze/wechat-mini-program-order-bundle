@@ -9,8 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
+use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use WechatMiniProgramOrderBundle\Enum\DeliveryMode;
 use WechatMiniProgramOrderBundle\Repository\SubOrderListRepository;
 
@@ -22,17 +21,13 @@ use WechatMiniProgramOrderBundle\Repository\SubOrderListRepository;
 class SubOrderList implements Stringable
 {
     use TimestampableAware;
+    use BlameableAware;
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[CreatedByColumn]
-    private ?string $createdBy = null;
-
-    #[UpdatedByColumn]
-    private ?string $updatedBy = null;
 
     /**
      * 所属合单物流信息
@@ -48,12 +43,7 @@ class SubOrderList implements Stringable
     #[ORM\JoinColumn(nullable: false, options: ['comment' => '订单信息'])]
     private ?OrderKey $orderKey = null;
 
-    /**
-     * 必填，发货模式，枚举值：
-     * 1. UNIFIED_DELIVERY（统一发货）
-     * 2. SPLIT_DELIVERY（分拆发货）
-     */
-    #[ORM\Column(type: 'string', enumType: DeliveryMode::class, options: ['comment' => '发货模式：统一发货/分拆发货'])]
+    #[ORM\Column(type: Types::STRING, enumType: DeliveryMode::class, options: ['comment' => '发货模式：统一发货/分拆发货'])]
     private DeliveryMode $deliveryMode = DeliveryMode::UNIFIED_DELIVERY;
 
     /**
@@ -71,30 +61,6 @@ class SubOrderList implements Stringable
     public function getId(): ?string
     {
         return $this->id;
-    }
-
-    public function setCreatedBy(?string $createdBy): self
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?string
-    {
-        return $this->createdBy;
-    }
-
-    public function setUpdatedBy(?string $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getUpdatedBy(): ?string
-    {
-        return $this->updatedBy;
     }
 
     public function getCombinedShippingInfo(): ?CombinedShippingInfo

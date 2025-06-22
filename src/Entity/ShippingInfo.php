@@ -8,8 +8,7 @@ use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
+use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use Tourze\WechatMiniProgramUserContracts\UserInterface;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramOrderBundle\Enum\LogisticsType;
@@ -23,17 +22,13 @@ use WechatMiniProgramOrderBundle\Repository\ShippingInfoRepository;
 class ShippingInfo implements Stringable
 {
     use TimestampableAware;
+    use BlameableAware;
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[CreatedByColumn]
-    private ?string $createdBy = null;
-
-    #[UpdatedByColumn]
-    private ?string $updatedBy = null;
 
     #[TrackColumn]
     private ?bool $valid = false;
@@ -59,63 +54,21 @@ class ShippingInfo implements Stringable
     #[ORM\JoinColumn(nullable: false, options: ['comment' => '支付者信息'])]
     private UserInterface $payer;
 
-    /**
-     * 必填，物流形式
-     */
-    #[ORM\Column(type: 'integer', enumType: LogisticsType::class, options: ['comment' => '物流形式'])]
+    #[ORM\Column(type: Types::INTEGER, enumType: LogisticsType::class, options: ['comment' => '物流形式'])]
     private LogisticsType $logisticsType = LogisticsType::PHYSICAL_LOGISTICS;
 
-    /**
-     * 必填，收件人手机号码
-     * 示例值: 13800138000
-     * 字符字节限制: [1, 128]
-     */
-    #[ORM\Column(length: 128, options: ['comment' => '收件人手机号码'])]
+    #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '收件人手机号码'])]
     private string $deliveryMobile;
 
-    /**
-     * 必填，物流单号
-     * 示例值: SF1234567890123
-     * 字符字节限制: [1, 128]
-     */
-    #[ORM\Column(length: 128, options: ['comment' => '物流单号'])]
+    #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '物流单号'])]
     private string $trackingNo;
 
-    /**
-     * 必填，物流公司名称
-     * 示例值: 顺丰速运
-     * 字符字节限制: [1, 128]
-     */
-    #[ORM\Column(length: 128, options: ['comment' => '物流公司名称'])]
+    #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '物流公司名称'])]
     private string $deliveryCompany;
 
     public function getId(): ?string
     {
         return $this->id;
-    }
-
-    public function setCreatedBy(?string $createdBy): self
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?string
-    {
-        return $this->createdBy;
-    }
-
-    public function setUpdatedBy(?string $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getUpdatedBy(): ?string
-    {
-        return $this->updatedBy;
     }
 
     public function isValid(): ?bool

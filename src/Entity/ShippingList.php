@@ -9,8 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
+use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use WechatMiniProgramOrderBundle\Repository\ShippingListRepository;
 
 /**
@@ -21,17 +20,13 @@ use WechatMiniProgramOrderBundle\Repository\ShippingListRepository;
 class ShippingList implements Stringable
 {
     use TimestampableAware;
+    use BlameableAware;
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[CreatedByColumn]
-    private ?string $createdBy = null;
-
-    #[UpdatedByColumn]
-    private ?string $updatedBy = null;
 
     /**
      * 所属子订单
@@ -40,19 +35,10 @@ class ShippingList implements Stringable
     #[ORM\JoinColumn(nullable: false, options: ['comment' => '所属子订单'])]
     private ?SubOrderList $subOrder = null;
 
-    /**
-     * 必填，物流单号，物流快递发货时必填
-     * 字符字节限制: [1, 128]
-     */
-    #[ORM\Column(length: 128, options: ['comment' => '物流单号，物流快递发货时必填'])]
+    #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '物流单号，物流快递发货时必填'])]
     private ?string $trackingNo = null;
 
-    /**
-     * 必填，物流公司编码，快递公司ID
-     * 参见「查询物流公司编码列表」，物流快递发货时必填
-     * 字符字节限制: [1, 128]
-     */
-    #[ORM\Column(length: 128, options: ['comment' => '物流公司编码，快递公司ID'])]
+    #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '物流公司编码，快递公司ID'])]
     private ?string $expressCompany = null;
 
     /**
@@ -72,16 +58,10 @@ class ShippingList implements Stringable
     #[ORM\JoinColumn(nullable: true, options: ['comment' => '联系方式，顺丰快递必填'])]
     private ?Contact $contact = null;
 
-    /**
-     * 物流轨迹信息
-     */
-    #[ORM\Column(type: 'json', nullable: true, options: ['comment' => '物流轨迹信息，包含物流状态和时间等'])]
+    #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '物流轨迹信息，包含物流状态和时间等'])]
     private ?array $trackingInfo = null;
 
-    /**
-     * 最后更新物流信息的时间
-     */
-    #[ORM\Column(type: 'datetime_immutable', nullable: true, options: ['comment' => '最后更新物流信息的时间'])]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '最后更新物流信息的时间'])]
     private ?\DateTimeImmutable $lastTrackingTime = null;
 
     public function __construct()
@@ -92,30 +72,6 @@ class ShippingList implements Stringable
     public function getId(): ?string
     {
         return $this->id;
-    }
-
-    public function setCreatedBy(?string $createdBy): self
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?string
-    {
-        return $this->createdBy;
-    }
-
-    public function setUpdatedBy(?string $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getUpdatedBy(): ?string
-    {
-        return $this->updatedBy;
     }
 
     public function getSubOrder(): ?SubOrderList

@@ -7,8 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
+use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use WechatMiniProgramOrderBundle\Repository\ShoppingItemListRepository;
 
 /**
@@ -19,47 +18,26 @@ use WechatMiniProgramOrderBundle\Repository\ShoppingItemListRepository;
 class ShoppingItemList implements Stringable
 {
     use TimestampableAware;
+    use BlameableAware;
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    /**
-     * 必填，商品ID
-     * 示例值: 123456
-     * 字符字节限制: [1, 128]
-     */
-    #[ORM\Column(length: 128, options: ['comment' => '商品ID'])]
+    #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '商品ID'])]
     private ?string $merchantItemId = null;
 
-    /**
-     * 必填，商品名称
-     * 示例值: 纯色白色短袖T恤
-     * 字符字节限制: [1, 128]
-     */
-    #[ORM\Column(length: 128, options: ['comment' => '商品名称'])]
+    #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '商品名称'])]
     private ?string $itemName = null;
 
-    /**
-     * 必填，商品数量
-     * 示例值: 2
-     */
-    #[ORM\Column(type: 'integer', options: ['comment' => '商品数量'])]
+    #[ORM\Column(type: Types::INTEGER, options: ['comment' => '商品数量'])]
     private ?int $itemCount = null;
 
-    /**
-     * 必填，商品单价，单位：元
-     * 示例值: 123.45
-     */
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, options: ['comment' => '商品单价，单位：元'])]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, options: ['comment' => '商品单价，单位：元'])]
     private ?string $itemPrice = null;
 
-    /**
-     * 必填，商品总价，单位：元
-     * 示例值: 246.90
-     */
-    #[ORM\Column(type: 'decimal', precision: 10, scale: 2, options: ['comment' => '商品总价，单位：元'])]
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, options: ['comment' => '商品总价，单位：元'])]
     private ?string $itemAmount = null;
 
     /**
@@ -69,11 +47,6 @@ class ShoppingItemList implements Stringable
     #[ORM\JoinColumn(nullable: false, options: ['comment' => '所属购物信息'])]
     private ?ShoppingInfo $shoppingInfo = null;
 
-    #[CreatedByColumn]
-    private ?string $createdBy = null;
-
-    #[UpdatedByColumn]
-    private ?string $updatedBy = null;
 
     public function getId(): ?string
     {
@@ -152,29 +125,6 @@ class ShoppingItemList implements Stringable
         return $this;
     }
 
-    public function setCreatedBy(?string $createdBy): self
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?string
-    {
-        return $this->createdBy;
-    }
-
-    public function setUpdatedBy(?string $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getUpdatedBy(): ?string
-    {
-        return $this->updatedBy;
-    }
     public function __toString(): string
     {
         return (string) $this->id;

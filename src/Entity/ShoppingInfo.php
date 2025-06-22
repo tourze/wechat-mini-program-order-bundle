@@ -10,8 +10,7 @@ use Stringable;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
-use Tourze\DoctrineUserBundle\Attribute\CreatedByColumn;
-use Tourze\DoctrineUserBundle\Attribute\UpdatedByColumn;
+use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use Tourze\WechatMiniProgramUserContracts\UserInterface;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramOrderBundle\Enum\LogisticsType;
@@ -26,17 +25,13 @@ use WechatMiniProgramOrderBundle\Repository\ShoppingInfoRepository;
 class ShoppingInfo implements Stringable
 {
     use TimestampableAware;
+    use BlameableAware;
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[CreatedByColumn]
-    private ?string $createdBy = null;
-
-    #[UpdatedByColumn]
-    private ?string $updatedBy = null;
 
     #[TrackColumn]
     private ?bool $valid = false;
@@ -62,30 +57,13 @@ class ShoppingInfo implements Stringable
     #[ORM\JoinColumn(nullable: false, options: ['comment' => '支付者信息'])]
     private UserInterface $payer;
 
-    /**
-     * 必填，物流形式
-     * 1. PHYSICAL_LOGISTICS - 实体物流配送采用快递公司进行实体物流配送形式
-     * 2. LOCAL_DELIVERY - 同城配送
-     * 3. VIRTUAL_GOODS - 虚拟商品，例如话费充值，点卡等，无实体配送形式
-     * 4. SELF_PICKUP - 用户自提
-     */
-    #[ORM\Column(type: 'integer', enumType: LogisticsType::class, options: ['comment' => '物流形式'])]
+    #[ORM\Column(type: Types::INTEGER, enumType: LogisticsType::class, options: ['comment' => '物流形式'])]
     private LogisticsType $logisticsType = LogisticsType::PHYSICAL_LOGISTICS;
 
-    /**
-     * 必填，订单详情页链接类型
-     * 1. URL - H5链接
-     * 2. MINI_PROGRAM - 小程序链接
-     */
-    #[ORM\Column(type: 'integer', enumType: OrderDetailType::class, options: ['comment' => '订单详情页链接类型'])]
+    #[ORM\Column(type: Types::INTEGER, enumType: OrderDetailType::class, options: ['comment' => '订单详情页链接类型'])]
     private OrderDetailType $orderDetailType = OrderDetailType::MINI_PROGRAM;
 
-    /**
-     * 必填，订单详情页链接
-     * 示例值: pages/order/order?id=123456
-     * 字符字节限制: [1, 1024]
-     */
-    #[ORM\Column(length: 1024, options: ['comment' => '订单详情页链接'])]
+    #[ORM\Column(type: Types::STRING, length: 1024, options: ['comment' => '订单详情页链接'])]
     private ?string $orderDetailPath = null;
 
     /**
@@ -102,30 +80,6 @@ class ShoppingInfo implements Stringable
     public function getId(): ?string
     {
         return $this->id;
-    }
-
-    public function setCreatedBy(?string $createdBy): self
-    {
-        $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?string
-    {
-        return $this->createdBy;
-    }
-
-    public function setUpdatedBy(?string $updatedBy): self
-    {
-        $this->updatedBy = $updatedBy;
-
-        return $this;
-    }
-
-    public function getUpdatedBy(): ?string
-    {
-        return $this->updatedBy;
     }
 
     public function isValid(): ?bool
