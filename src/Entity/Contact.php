@@ -5,7 +5,7 @@ namespace WechatMiniProgramOrderBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use WechatMiniProgramOrderBundle\Repository\ContactRepository;
@@ -17,13 +17,9 @@ use WechatMiniProgramOrderBundle\Repository\ContactRepository;
 #[ORM\Table(name: 'wechat_mini_program_contact', options: ['comment' => '联系方式信息表'])]
 class Contact implements Stringable
 {
+    use SnowflakeKeyAware;
     use TimestampableAware;
     use BlameableAware;
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
 
     #[ORM\Column(length: 1024, nullable: true, options: ['comment' => '寄件人联系方式，采用掩码传输'])]
     private ?string $consignorContact = null;
@@ -31,10 +27,6 @@ class Contact implements Stringable
     #[ORM\Column(length: 1024, nullable: true, options: ['comment' => '收件人联系方式，采用掩码传输'])]
     private ?string $receiverContact = null;
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getConsignorContact(): ?string
     {

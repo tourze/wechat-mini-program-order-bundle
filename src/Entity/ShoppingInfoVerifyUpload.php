@@ -5,7 +5,7 @@ namespace WechatMiniProgramOrderBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use WechatMiniProgramOrderBundle\Enum\ShoppingInfoVerifyStatus;
@@ -15,13 +15,9 @@ use WechatMiniProgramOrderBundle\Repository\ShoppingInfoVerifyUploadRepository;
 #[ORM\Table(name: 'wechat_mini_program_shopping_info_verify_upload', options: ['comment' => '表描述'])]
 class ShoppingInfoVerifyUpload implements Stringable
 {
+    use SnowflakeKeyAware;
     use TimestampableAware;
     use BlameableAware;
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
 
 
     #[ORM\Column(type: Types::STRING, length: 64, options: ['comment' => '订单ID'])]
@@ -42,10 +38,6 @@ class ShoppingInfoVerifyUpload implements Stringable
     #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '验证结果数据'])]
     private ?array $resultData = null;
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getOrderId(): ?string
     {

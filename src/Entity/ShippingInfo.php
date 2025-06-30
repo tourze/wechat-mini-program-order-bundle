@@ -5,7 +5,7 @@ namespace WechatMiniProgramOrderBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use Tourze\DoctrineUserBundle\Traits\BlameableAware;
@@ -21,13 +21,9 @@ use WechatMiniProgramOrderBundle\Repository\ShippingInfoRepository;
 #[ORM\Table(name: 'wechat_mini_program_shipping_info', options: ['comment' => '物流信息表'])]
 class ShippingInfo implements Stringable
 {
+    use SnowflakeKeyAware;
     use TimestampableAware;
     use BlameableAware;
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
 
 
     #[TrackColumn]
@@ -66,10 +62,6 @@ class ShippingInfo implements Stringable
     #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '物流公司名称'])]
     private string $deliveryCompany;
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function isValid(): ?bool
     {

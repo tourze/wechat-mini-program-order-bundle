@@ -5,7 +5,7 @@ namespace WechatMiniProgramOrderBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use WechatMiniProgramOrderBundle\Enum\OrderNumberType;
@@ -18,13 +18,9 @@ use WechatMiniProgramOrderBundle\Repository\OrderKeyRepository;
 #[ORM\Table(name: 'wechat_mini_program_order_key', options: ['comment' => '订单标识信息表'])]
 class OrderKey implements Stringable
 {
+    use SnowflakeKeyAware;
     use TimestampableAware;
     use BlameableAware;
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
 
 
     #[ORM\Column(type: Types::INTEGER, enumType: OrderNumberType::class, options: ['comment' => '订单单号类型：1-使用商户单号，2-使用微信单号'])]
@@ -39,10 +35,6 @@ class OrderKey implements Stringable
     #[ORM\Column(type: Types::STRING, length: 64, nullable: true, options: ['comment' => '商户系统内部订单号'])]
     private ?string $outTradeNo = null;
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getOrderNumberType(): OrderNumberType
     {

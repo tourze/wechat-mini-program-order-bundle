@@ -5,7 +5,7 @@ namespace WechatMiniProgramOrderBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use Tourze\WechatMiniProgramUserContracts\UserInterface;
@@ -19,13 +19,9 @@ use WechatMiniProgramOrderBundle\Repository\CombinedShoppingInfoRepository;
 #[ORM\Table(name: 'wechat_mini_program_combined_shopping_info', options: ['comment' => '合单购物信息表'])]
 class CombinedShoppingInfo implements Stringable
 {
+    use SnowflakeKeyAware;
     use TimestampableAware;
     use BlameableAware;
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
 
     /**
      * 必填，小程序账号
@@ -67,10 +63,6 @@ class CombinedShoppingInfo implements Stringable
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?ShippingInfo $shippingInfo = null;
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getAccount(): Account
     {

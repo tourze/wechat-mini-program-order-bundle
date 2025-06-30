@@ -5,7 +5,7 @@ namespace WechatMiniProgramOrderBundle\Entity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Stringable;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserBundle\Traits\BlameableAware;
 use WechatMiniProgramOrderBundle\Repository\ShippingItemListRepository;
@@ -17,13 +17,9 @@ use WechatMiniProgramOrderBundle\Repository\ShippingItemListRepository;
 #[ORM\Table(name: 'wechat_mini_program_shipping_item_list', options: ['comment' => '物流商品列表项'])]
 class ShippingItemList implements Stringable
 {
+    use SnowflakeKeyAware;
     use TimestampableAware;
     use BlameableAware;
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
 
 
     /**
@@ -36,10 +32,6 @@ class ShippingItemList implements Stringable
     #[ORM\Column(type: Types::STRING, length: 64, options: ['comment' => '商户侧商品ID，商户系统内部商品编码'])]
     private ?string $merchantItemId = null;
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getShippingList(): ?ShippingList
     {
