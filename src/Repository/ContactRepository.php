@@ -1,17 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramOrderBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Tourze\PHPUnitSymfonyKernelTest\Attribute\AsRepository;
 use WechatMiniProgramOrderBundle\Entity\Contact;
 
 /**
- * @method Contact|null find($id, $lockMode = null, $lockVersion = null)
- * @method Contact|null findOneBy(array $criteria, array $orderBy = null)
- * @method Contact[]    findAll()
- * @method Contact[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<Contact>
  */
+#[AsRepository(entityClass: Contact::class)]
 class ContactRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -21,6 +22,7 @@ class ContactRepository extends ServiceEntityRepository
 
     /**
      * 根据手机号查找联系人
+     * @return array<Contact>
      */
     public function findByMobile(string $mobile): array
     {
@@ -29,6 +31,7 @@ class ContactRepository extends ServiceEntityRepository
 
     /**
      * 根据姓名查找联系人
+     * @return array<Contact>
      */
     public function findByName(string $name): array
     {
@@ -37,13 +40,54 @@ class ContactRepository extends ServiceEntityRepository
 
     /**
      * 根据地址查找联系人
+     * @return array<Contact>
      */
     public function findByAddress(string $address): array
     {
-        return $this->createQueryBuilder('c')
+        /** @var Contact[] $result */
+        $result = $this->createQueryBuilder('c')
             ->where('c.address LIKE :address')
             ->setParameter('address', '%' . $address . '%')
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
+
+        return $result;
+    }
+
+    /**
+     * 根据寄件人联系方式查找联系人
+     * @return array<Contact>
+     */
+    public function findByConsignorContact(?string $consignorContact): array
+    {
+        return $this->findBy(['consignorContact' => $consignorContact]);
+    }
+
+    /**
+     * 根据收件人联系方式查找联系人
+     * @return array<Contact>
+     */
+    public function findByReceiverContact(?string $receiverContact): array
+    {
+        return $this->findBy(['receiverContact' => $receiverContact]);
+    }
+
+    public function save(Contact $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(Contact $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
     }
 }

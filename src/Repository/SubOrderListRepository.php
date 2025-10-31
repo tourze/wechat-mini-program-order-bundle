@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramOrderBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Tourze\PHPUnitSymfonyKernelTest\Attribute\AsRepository;
 use WechatMiniProgramOrderBundle\Entity\SubOrderList;
 use WechatMiniProgramOrderBundle\Enum\DeliveryMode;
 
 /**
- * @method SubOrderList|null find($id, $lockMode = null, $lockVersion = null)
- * @method SubOrderList|null findOneBy(array $criteria, array $orderBy = null)
- * @method SubOrderList[]    findAll()
- * @method SubOrderList[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<SubOrderList>
  */
+#[AsRepository(entityClass: SubOrderList::class)]
 class SubOrderListRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -22,6 +23,7 @@ class SubOrderListRepository extends ServiceEntityRepository
 
     /**
      * 根据合单ID查找所有子单
+     * @return array<SubOrderList>
      */
     public function findByCombinedShippingInfoId(string $combinedShippingInfoId): array
     {
@@ -30,6 +32,7 @@ class SubOrderListRepository extends ServiceEntityRepository
 
     /**
      * 根据发货模式查找子单
+     * @return array<SubOrderList>
      */
     public function findByDeliveryMode(DeliveryMode $deliveryMode): array
     {
@@ -41,13 +44,34 @@ class SubOrderListRepository extends ServiceEntityRepository
      */
     public function findByOrderKey(string $orderId, string $outOrderId): ?SubOrderList
     {
-        return $this->createQueryBuilder('s')
+        $result = $this->createQueryBuilder('s')
             ->join('s.orderKey', 'ok')
             ->where('ok.orderId = :orderId')
             ->andWhere('ok.outOrderId = :outOrderId')
             ->setParameter('orderId', $orderId)
             ->setParameter('outOrderId', $outOrderId)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult()
+        ;
+
+        return $result instanceof SubOrderList ? $result : null;
+    }
+
+    public function save(SubOrderList $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(SubOrderList $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
     }
 }

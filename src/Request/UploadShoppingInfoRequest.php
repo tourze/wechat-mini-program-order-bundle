@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramOrderBundle\Request;
 
 use WechatMiniProgramBundle\Request\WithAccountRequest;
@@ -58,10 +60,8 @@ class UploadShoppingInfoRequest extends WithAccountRequest
         return $this->shoppingInfo;
     }
 
-    public function setShoppingInfo(ShoppingInfo $shoppingInfo): self
+    public function setShoppingInfo(ShoppingInfo $shoppingInfo): void
     {
         $this->shoppingInfo = $shoppingInfo;
-
-        return $this;
     }
 }

@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramOrderBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Stringable;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserBundle\Traits\BlameableAware;
+use Tourze\WechatMiniProgramAppIDContracts\MiniProgramInterface;
 use Tourze\WechatMiniProgramUserContracts\UserInterface;
-use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramOrderBundle\Repository\CombinedShoppingInfoRepository;
 
 /**
@@ -17,7 +19,7 @@ use WechatMiniProgramOrderBundle\Repository\CombinedShoppingInfoRepository;
  */
 #[ORM\Entity(repositoryClass: CombinedShoppingInfoRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_combined_shopping_info', options: ['comment' => '合单购物信息表'])]
-class CombinedShoppingInfo implements Stringable
+class CombinedShoppingInfo implements \Stringable
 {
     use SnowflakeKeyAware;
     use TimestampableAware;
@@ -26,35 +28,49 @@ class CombinedShoppingInfo implements Stringable
     /**
      * 必填，小程序账号
      */
-    #[ORM\ManyToOne(targetEntity: Account::class)]
+    #[ORM\ManyToOne(targetEntity: MiniProgramInterface::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false, options: ['comment' => '小程序账号'])]
-    private Account $account;
+    private MiniProgramInterface $account;
 
-#[ORM\Column(length: 64, options: ['comment' => '字段说明'])]
-    private ?string $orderId = null;
+    #[ORM\Column(length: 64, nullable: false, options: ['comment' => '订单ID'])]
+    #[Assert\Length(max: 64)]
+    #[Assert\NotBlank]
+    private string $orderId;
 
-#[ORM\Column(length: 64, options: ['comment' => '字段说明'])]
+    #[ORM\Column(length: 64, options: ['comment' => '字段说明'])]
+    #[Assert\Length(max: 64)]
+    #[Assert\NotBlank]
     private ?string $outOrderId = null;
 
-#[ORM\Column(length: 64, options: ['comment' => '字段说明'])]
+    #[ORM\Column(length: 64, options: ['comment' => '字段说明'])]
+    #[Assert\Length(max: 64)]
+    #[Assert\NotBlank]
     private ?string $pathId = null;
 
-#[ORM\Column(length: 32, options: ['comment' => '字段说明'])]
+    #[ORM\Column(length: 32, options: ['comment' => '字段说明'])]
+    #[Assert\Length(max: 32)]
+    #[Assert\NotBlank]
     private ?string $status = null;
 
-#[ORM\Column(type: Types::INTEGER, options: ['comment' => '字段说明'])]
+    #[ORM\Column(type: Types::INTEGER, options: ['comment' => '字段说明'])]
+    #[Assert\PositiveOrZero]
+    #[Assert\NotNull]
     private ?int $totalAmount = null;
 
-#[ORM\Column(type: Types::INTEGER, options: ['comment' => '字段说明'])]
+    #[ORM\Column(type: Types::INTEGER, options: ['comment' => '字段说明'])]
+    #[Assert\PositiveOrZero]
+    #[Assert\NotNull]
     private ?int $payAmount = null;
 
-#[ORM\Column(type: Types::INTEGER, options: ['comment' => '字段说明'])]
+    #[ORM\Column(type: Types::INTEGER, options: ['comment' => '字段说明'])]
+    #[Assert\Range(min: 0, max: 100)]
     private ?int $discountAmount = null;
 
-#[ORM\Column(type: Types::INTEGER, options: ['comment' => '字段说明'])]
+    #[ORM\Column(type: Types::INTEGER, options: ['comment' => '字段说明'])]
+    #[Assert\PositiveOrZero]
     private ?int $freightAmount = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(targetEntity: UserInterface::class, cascade: ['persist', 'remove'])]
     private ?UserInterface $payer = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
@@ -63,29 +79,24 @@ class CombinedShoppingInfo implements Stringable
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?ShippingInfo $shippingInfo = null;
 
-
-    public function getAccount(): Account
+    public function getAccount(): MiniProgramInterface
     {
         return $this->account;
     }
 
-    public function setAccount(Account $account): self
+    public function setAccount(MiniProgramInterface $account): void
     {
         $this->account = $account;
-
-        return $this;
     }
 
-    public function getOrderId(): ?string
+    public function getOrderId(): string
     {
         return $this->orderId;
     }
 
-    public function setOrderId(?string $orderId): self
+    public function setOrderId(string $orderId): void
     {
         $this->orderId = $orderId;
-
-        return $this;
     }
 
     public function getOutOrderId(): ?string
@@ -93,11 +104,9 @@ class CombinedShoppingInfo implements Stringable
         return $this->outOrderId;
     }
 
-    public function setOutOrderId(?string $outOrderId): self
+    public function setOutOrderId(?string $outOrderId): void
     {
         $this->outOrderId = $outOrderId;
-
-        return $this;
     }
 
     public function getPathId(): ?string
@@ -105,11 +114,9 @@ class CombinedShoppingInfo implements Stringable
         return $this->pathId;
     }
 
-    public function setPathId(?string $pathId): self
+    public function setPathId(?string $pathId): void
     {
         $this->pathId = $pathId;
-
-        return $this;
     }
 
     public function getStatus(): ?string
@@ -117,11 +124,9 @@ class CombinedShoppingInfo implements Stringable
         return $this->status;
     }
 
-    public function setStatus(?string $status): self
+    public function setStatus(?string $status): void
     {
         $this->status = $status;
-
-        return $this;
     }
 
     public function getTotalAmount(): ?int
@@ -129,11 +134,9 @@ class CombinedShoppingInfo implements Stringable
         return $this->totalAmount;
     }
 
-    public function setTotalAmount(?int $totalAmount): self
+    public function setTotalAmount(?int $totalAmount): void
     {
         $this->totalAmount = $totalAmount;
-
-        return $this;
     }
 
     public function getPayAmount(): ?int
@@ -141,11 +144,9 @@ class CombinedShoppingInfo implements Stringable
         return $this->payAmount;
     }
 
-    public function setPayAmount(?int $payAmount): self
+    public function setPayAmount(?int $payAmount): void
     {
         $this->payAmount = $payAmount;
-
-        return $this;
     }
 
     public function getDiscountAmount(): ?int
@@ -153,11 +154,9 @@ class CombinedShoppingInfo implements Stringable
         return $this->discountAmount;
     }
 
-    public function setDiscountAmount(?int $discountAmount): self
+    public function setDiscountAmount(?int $discountAmount): void
     {
         $this->discountAmount = $discountAmount;
-
-        return $this;
     }
 
     public function getFreightAmount(): ?int
@@ -165,11 +164,9 @@ class CombinedShoppingInfo implements Stringable
         return $this->freightAmount;
     }
 
-    public function setFreightAmount(?int $freightAmount): self
+    public function setFreightAmount(?int $freightAmount): void
     {
         $this->freightAmount = $freightAmount;
-
-        return $this;
     }
 
     public function getPayer(): ?UserInterface
@@ -177,11 +174,9 @@ class CombinedShoppingInfo implements Stringable
         return $this->payer;
     }
 
-    public function setPayer(?UserInterface $payer): self
+    public function setPayer(?UserInterface $payer): void
     {
         $this->payer = $payer;
-
-        return $this;
     }
 
     public function getContact(): ?Contact
@@ -189,11 +184,9 @@ class CombinedShoppingInfo implements Stringable
         return $this->contact;
     }
 
-    public function setContact(?Contact $contact): self
+    public function setContact(?Contact $contact): void
     {
         $this->contact = $contact;
-
-        return $this;
     }
 
     public function getShippingInfo(): ?ShippingInfo
@@ -201,12 +194,11 @@ class CombinedShoppingInfo implements Stringable
         return $this->shippingInfo;
     }
 
-    public function setShippingInfo(?ShippingInfo $shippingInfo): self
+    public function setShippingInfo(?ShippingInfo $shippingInfo): void
     {
         $this->shippingInfo = $shippingInfo;
-
-        return $this;
     }
+
     public function __toString(): string
     {
         return (string) $this->id;

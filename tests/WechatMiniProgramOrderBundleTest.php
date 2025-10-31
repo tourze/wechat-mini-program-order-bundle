@@ -1,21 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramOrderBundle\Tests;
 
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractBundleTestCase;
 use WechatMiniProgramOrderBundle\WechatMiniProgramOrderBundle;
 
-class WechatMiniProgramOrderBundleTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(WechatMiniProgramOrderBundle::class)]
+#[RunTestsInSeparateProcesses]
+final class WechatMiniProgramOrderBundleTest extends AbstractBundleTestCase
 {
-    public function testBundleConstruction(): void
-    {
-        $bundle = new WechatMiniProgramOrderBundle();
-        $this->assertInstanceOf(WechatMiniProgramOrderBundle::class, $bundle);
-    }
-    
-    public function testBundleExtendsSfBundle(): void
-    {
-        $bundle = new WechatMiniProgramOrderBundle();
-        $this->assertInstanceOf(\Symfony\Component\HttpKernel\Bundle\Bundle::class, $bundle);
-    }
 }

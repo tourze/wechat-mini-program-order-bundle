@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramOrderBundle\EventSubscriber;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Events;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use WechatMiniProgramBundle\Service\Client;
 use WechatMiniProgramOrderBundle\Entity\ShippingInfo;
 use WechatMiniProgramOrderBundle\Request\UploadShippingInfoRequest;
 
 #[AsEntityListener(event: Events::prePersist, method: 'prePersist', entity: ShippingInfo::class)]
+#[Autoconfigure(public: true)]
 class ShippingInfoListener
 {
     public function __construct(
@@ -18,9 +22,15 @@ class ShippingInfoListener
 
     public function prePersist(ShippingInfo $shippingInfo): void
     {
-        $request = new UploadShippingInfoRequest();
-        $request->setAccount($shippingInfo->getAccount());
-        $request->setShippingInfo($shippingInfo);
-        $this->client->asyncRequest($request);
+        try {
+            $account = $shippingInfo->getAccount();
+            $request = new UploadShippingInfoRequest();
+            $request->setAccount($account);
+            $request->setShippingInfo($shippingInfo);
+            $this->client->asyncRequest($request);
+        } catch (\Error $e) {
+            // 如果 account 未初始化，忽略并跳过
+            return;
+        }
     }
 }

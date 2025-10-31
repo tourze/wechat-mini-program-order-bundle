@@ -1,17 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramOrderBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Tourze\PHPUnitSymfonyKernelTest\Attribute\AsRepository;
 use WechatMiniProgramOrderBundle\Entity\ShippingList;
 
 /**
- * @method ShippingList|null find($id, $lockMode = null, $lockVersion = null)
- * @method ShippingList|null findOneBy(array $criteria, array $orderBy = null)
- * @method ShippingList[]    findAll()
- * @method ShippingList[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<ShippingList>
  */
+#[AsRepository(entityClass: ShippingList::class)]
 class ShippingListRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -21,10 +22,22 @@ class ShippingListRepository extends ServiceEntityRepository
 
     /**
      * 根据订单ID查找物流信息
+     * @return array<ShippingList>
      */
     public function findByOrderId(string $orderId): array
     {
-        return $this->findBy(['orderId' => $orderId], ['createdAt' => 'DESC']);
+        /** @var ShippingList[] $result */
+        $result = $this->createQueryBuilder('sl')
+            ->join('sl.subOrder', 'so')
+            ->join('so.orderKey', 'ok')
+            ->where('ok.orderId = :orderId')
+            ->setParameter('orderId', $orderId)
+            ->orderBy('sl.createTime', 'DESC')
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return $result;
     }
 
     /**
@@ -32,18 +45,43 @@ class ShippingListRepository extends ServiceEntityRepository
      */
     public function findByTrackingNo(string $trackingNo): ?ShippingList
     {
-        return $this->findOneBy(['trackingNo' => $trackingNo]);
+        $result = $this->findOneBy(['trackingNo' => $trackingNo]);
+
+        return $result instanceof ShippingList ? $result : null;
     }
 
     /**
      * 查找需要更新物流信息的记录
+     * @return array<ShippingList>
      */
     public function findNeedUpdateTracking(\DateTimeInterface $beforeTime): array
     {
-        return $this->createQueryBuilder('s')
+        /** @var ShippingList[] $result */
+        $result = $this->createQueryBuilder('s')
             ->andWhere('s.lastTrackingTime IS NULL OR s.lastTrackingTime < :beforeTime')
             ->setParameter('beforeTime', $beforeTime)
             ->getQuery()
-            ->getResult();
+            ->getResult()
+        ;
+
+        return $result;
+    }
+
+    public function save(ShippingList $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(ShippingList $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
     }
 }

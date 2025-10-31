@@ -1,17 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramOrderBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Tourze\PHPUnitSymfonyKernelTest\Attribute\AsRepository;
 use WechatMiniProgramOrderBundle\Entity\ShippingItemList;
 
 /**
- * @method ShippingItemList|null find($id, $lockMode = null, $lockVersion = null)
- * @method ShippingItemList|null findOneBy(array $criteria, array $orderBy = null)
- * @method ShippingItemList[]    findAll()
- * @method ShippingItemList[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<ShippingItemList>
  */
+#[AsRepository(entityClass: ShippingItemList::class)]
 class ShippingItemListRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -21,6 +22,7 @@ class ShippingItemListRepository extends ServiceEntityRepository
 
     /**
      * 根据商户商品ID查找物流商品
+     * @return array<ShippingItemList>
      */
     public function findByMerchantItemId(string $merchantItemId): array
     {
@@ -29,9 +31,37 @@ class ShippingItemListRepository extends ServiceEntityRepository
 
     /**
      * 根据物流单号查找物流商品列表
+     * @return ShippingItemList[]
      */
-    public function findByShippingList(string $shippingListId): array
+    public function findByShippingList(string $trackingNo): array
     {
-        return $this->findBy(['shippingList' => $shippingListId]);
+        /** @var ShippingItemList[] $result */
+        $result = $this->createQueryBuilder('sil')
+            ->innerJoin('sil.shippingList', 'sl')
+            ->where('sl.trackingNo = :trackingNo')
+            ->setParameter('trackingNo', $trackingNo)
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return $result;
+    }
+
+    public function save(ShippingItemList $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(ShippingItemList $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
     }
 }

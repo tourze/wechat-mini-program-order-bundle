@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramOrderBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Stringable;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineUserBundle\Traits\BlameableAware;
@@ -15,46 +17,54 @@ use WechatMiniProgramOrderBundle\Repository\ShoppingItemListRepository;
  */
 #[ORM\Entity(repositoryClass: ShoppingItemListRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_shopping_item_list', options: ['comment' => '购物商品列表项表'])]
-class ShoppingItemList implements Stringable
+class ShoppingItemList implements \Stringable
 {
     use SnowflakeKeyAware;
     use TimestampableAware;
     use BlameableAware;
 
     #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '商品ID'])]
+    #[Assert\Length(max: 128)]
+    #[Assert\NotBlank]
     private ?string $merchantItemId = null;
 
     #[ORM\Column(type: Types::STRING, length: 128, options: ['comment' => '商品名称'])]
+    #[Assert\Length(max: 128)]
+    #[Assert\NotBlank]
     private ?string $itemName = null;
 
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => '商品数量'])]
+    #[Assert\PositiveOrZero]
+    #[Assert\NotNull]
     private ?int $itemCount = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, options: ['comment' => '商品单价，单位：元'])]
+    #[Assert\Regex(pattern: '/^\d+(\.\d{1,2})?$/')]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 13)]
     private ?string $itemPrice = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, options: ['comment' => '商品总价，单位：元'])]
+    #[Assert\Regex(pattern: '/^\d+(\.\d{1,2})?$/')]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 13)]
     private ?string $itemAmount = null;
 
     /**
      * 所属购物信息
      */
-    #[ORM\ManyToOne(inversedBy: 'itemList')]
+    #[ORM\ManyToOne(inversedBy: 'itemList', cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false, options: ['comment' => '所属购物信息'])]
     private ?ShoppingInfo $shoppingInfo = null;
-
-
 
     public function getMerchantItemId(): ?string
     {
         return $this->merchantItemId;
     }
 
-    public function setMerchantItemId(?string $merchantItemId): self
+    public function setMerchantItemId(?string $merchantItemId): void
     {
         $this->merchantItemId = $merchantItemId;
-
-        return $this;
     }
 
     public function getItemName(): ?string
@@ -62,11 +72,9 @@ class ShoppingItemList implements Stringable
         return $this->itemName;
     }
 
-    public function setItemName(?string $itemName): self
+    public function setItemName(?string $itemName): void
     {
         $this->itemName = $itemName;
-
-        return $this;
     }
 
     public function getItemCount(): ?int
@@ -74,11 +82,9 @@ class ShoppingItemList implements Stringable
         return $this->itemCount;
     }
 
-    public function setItemCount(?int $itemCount): self
+    public function setItemCount(?int $itemCount): void
     {
         $this->itemCount = $itemCount;
-
-        return $this;
     }
 
     public function getItemPrice(): ?string
@@ -86,11 +92,9 @@ class ShoppingItemList implements Stringable
         return $this->itemPrice;
     }
 
-    public function setItemPrice(?string $itemPrice): self
+    public function setItemPrice(?string $itemPrice): void
     {
         $this->itemPrice = $itemPrice;
-
-        return $this;
     }
 
     public function getItemAmount(): ?string
@@ -98,11 +102,9 @@ class ShoppingItemList implements Stringable
         return $this->itemAmount;
     }
 
-    public function setItemAmount(?string $itemAmount): self
+    public function setItemAmount(?string $itemAmount): void
     {
         $this->itemAmount = $itemAmount;
-
-        return $this;
     }
 
     public function getShoppingInfo(): ?ShoppingInfo
@@ -110,11 +112,9 @@ class ShoppingItemList implements Stringable
         return $this->shoppingInfo;
     }
 
-    public function setShoppingInfo(?ShoppingInfo $shoppingInfo): self
+    public function setShoppingInfo(?ShoppingInfo $shoppingInfo): void
     {
         $this->shoppingInfo = $shoppingInfo;
-
-        return $this;
     }
 
     public function __toString(): string

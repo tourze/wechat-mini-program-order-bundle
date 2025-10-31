@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramOrderBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Tourze\PHPUnitSymfonyKernelTest\Attribute\AsRepository;
 use WechatMiniProgramOrderBundle\Entity\ShoppingInfoVerifyUpload;
 use WechatMiniProgramOrderBundle\Enum\ShoppingInfoVerifyStatus;
 
 /**
- * @method ShoppingInfoVerifyUpload|null find($id, $lockMode = null, $lockVersion = null)
- * @method ShoppingInfoVerifyUpload|null findOneBy(array $criteria, array $orderBy = null)
- * @method ShoppingInfoVerifyUpload[]    findAll()
- * @method ShoppingInfoVerifyUpload[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<ShoppingInfoVerifyUpload>
  */
+#[AsRepository(entityClass: ShoppingInfoVerifyUpload::class)]
 class ShoppingInfoVerifyUploadRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -25,20 +26,42 @@ class ShoppingInfoVerifyUploadRepository extends ServiceEntityRepository
      */
     public function findLatestByOrderId(string $orderId): ?ShoppingInfoVerifyUpload
     {
-        return $this->createQueryBuilder('s')
+        $result = $this->createQueryBuilder('s')
             ->andWhere('s.orderId = :orderId')
             ->setParameter('orderId', $orderId)
-            ->orderBy('s.createdAt', 'DESC')
+            ->orderBy('s.createTime', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
-            ->getOneOrNullResult();
+            ->getOneOrNullResult()
+        ;
+
+        return $result instanceof ShoppingInfoVerifyUpload ? $result : null;
     }
 
     /**
      * 查找所有待验证的记录
+     * @return array<ShoppingInfoVerifyUpload>
      */
     public function findAllPending(): array
     {
         return $this->findBy(['status' => ShoppingInfoVerifyStatus::PENDING]);
+    }
+
+    public function save(ShoppingInfoVerifyUpload $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(ShoppingInfoVerifyUpload $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
     }
 }

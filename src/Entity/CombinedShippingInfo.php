@@ -1,18 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramOrderBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Stringable;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use Tourze\DoctrineTrackBundle\Attribute\TrackColumn;
 use Tourze\DoctrineUserBundle\Traits\BlameableAware;
+use Tourze\WechatMiniProgramAppIDContracts\MiniProgramInterface;
 use Tourze\WechatMiniProgramUserContracts\UserInterface;
-use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramOrderBundle\Repository\CombinedShippingInfoRepository;
 
 /**
@@ -20,7 +22,7 @@ use WechatMiniProgramOrderBundle\Repository\CombinedShippingInfoRepository;
  */
 #[ORM\Entity(repositoryClass: CombinedShippingInfoRepository::class)]
 #[ORM\Table(name: 'wechat_mini_program_combined_shipping_info', options: ['comment' => '合单物流信息表'])]
-class CombinedShippingInfo implements Stringable
+class CombinedShippingInfo implements \Stringable
 {
     use SnowflakeKeyAware;
     use TimestampableAware;
@@ -29,9 +31,9 @@ class CombinedShippingInfo implements Stringable
     /**
      * 必填，小程序账号
      */
-    #[ORM\ManyToOne(targetEntity: Account::class)]
+    #[ORM\ManyToOne(targetEntity: MiniProgramInterface::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false, options: ['comment' => '小程序账号'])]
-    private Account $account;
+    private MiniProgramInterface $account;
 
     /**
      * 必填，合单订单信息
@@ -42,6 +44,7 @@ class CombinedShippingInfo implements Stringable
 
     /**
      * 子单物流详情列表
+     * @var Collection<int, SubOrderList>
      */
     #[ORM\OneToMany(targetEntity: SubOrderList::class, mappedBy: 'combinedShippingInfo', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $subOrders;
@@ -54,9 +57,12 @@ class CombinedShippingInfo implements Stringable
     private ?UserInterface $payer = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ['comment' => '上传时间，用于标识请求的先后顺序'])]
+    #[Assert\NotNull]
     private \DateTimeImmutable $uploadTime;
 
+    #[ORM\Column(type: Types::BOOLEAN, nullable: true, options: ['comment' => '有效状态'])]
     #[TrackColumn]
+    #[Assert\Type(type: 'bool')]
     private ?bool $valid = false;
 
     public function __construct()
@@ -65,17 +71,14 @@ class CombinedShippingInfo implements Stringable
         $this->uploadTime = new \DateTimeImmutable();
     }
 
-
-    public function getAccount(): Account
+    public function getAccount(): MiniProgramInterface
     {
         return $this->account;
     }
 
-    public function setAccount(Account $account): self
+    public function setAccount(MiniProgramInterface $account): void
     {
         $this->account = $account;
-
-        return $this;
     }
 
     public function getOrderKey(): ?OrderKey
@@ -83,11 +86,9 @@ class CombinedShippingInfo implements Stringable
         return $this->orderKey;
     }
 
-    public function setOrderKey(?OrderKey $orderKey): self
+    public function setOrderKey(?OrderKey $orderKey): void
     {
         $this->orderKey = $orderKey;
-
-        return $this;
     }
 
     /**
@@ -98,25 +99,16 @@ class CombinedShippingInfo implements Stringable
         return $this->subOrders;
     }
 
-    public function addSubOrder(SubOrderList $subOrder): self
+    public function addSubOrder(SubOrderList $subOrder): void
     {
         if (!$this->subOrders->contains($subOrder)) {
             $this->subOrders->add($subOrder);
-            $subOrder->setCombinedShippingInfo($this);
         }
-
-        return $this;
     }
 
-    public function removeSubOrder(SubOrderList $subOrder): self
+    public function removeSubOrder(SubOrderList $subOrder): void
     {
-        if ($this->subOrders->removeElement($subOrder)) {
-            if ($subOrder->getCombinedShippingInfo() === $this) {
-                $subOrder->setCombinedShippingInfo(null);
-            }
-        }
-
-        return $this;
+        $this->subOrders->removeElement($subOrder);
     }
 
     public function getPayer(): ?UserInterface
@@ -124,11 +116,9 @@ class CombinedShippingInfo implements Stringable
         return $this->payer;
     }
 
-    public function setPayer(?UserInterface $payer): self
+    public function setPayer(?UserInterface $payer): void
     {
         $this->payer = $payer;
-
-        return $this;
     }
 
     public function getUploadTime(): \DateTimeImmutable
@@ -136,11 +126,9 @@ class CombinedShippingInfo implements Stringable
         return $this->uploadTime;
     }
 
-    public function setUploadTime(\DateTimeImmutable $uploadTime): self
+    public function setUploadTime(\DateTimeImmutable $uploadTime): void
     {
         $this->uploadTime = $uploadTime;
-
-        return $this;
     }
 
     public function isValid(): ?bool
@@ -148,11 +136,9 @@ class CombinedShippingInfo implements Stringable
         return $this->valid;
     }
 
-    public function setValid(?bool $valid): self
+    public function setValid(?bool $valid): void
     {
         $this->valid = $valid;
-
-        return $this;
     }
 
     public function __toString(): string

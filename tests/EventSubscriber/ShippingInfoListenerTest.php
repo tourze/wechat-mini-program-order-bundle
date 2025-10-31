@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramOrderBundle\Tests\EventSubscriber;
 
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramBundle\Service\Client;
@@ -10,61 +13,92 @@ use WechatMiniProgramOrderBundle\Entity\ShippingInfo;
 use WechatMiniProgramOrderBundle\EventSubscriber\ShippingInfoListener;
 use WechatMiniProgramOrderBundle\Request\UploadShippingInfoRequest;
 
-class ShippingInfoListenerTest extends TestCase
+/**
+ * @internal
+ * @phpstan-ignore-next-line tourze.serviceTestShouldExtendIntegrationTestCase
+ */
+#[CoversClass(ShippingInfoListener::class)]
+final class ShippingInfoListenerTest extends TestCase
 {
-    private Client|MockObject $client;
-    private ShippingInfoListener $listener;
-
-    protected function setUp(): void
+    public function testPrePersistShouldCreateRequestAndCallAsyncRequestWithCorrectData(): void
     {
-        $this->client = $this->createMock(Client::class);
-        $this->listener = new ShippingInfoListener($this->client);
-    }
+        // Arrange
+        $client = $this->createMock(Client::class);
+        $listener = new ShippingInfoListener($client);
 
-    public function testPrePersistCreatesRequestAndCallsAsyncRequest(): void
-    {
-        // 准备测试数据
-        $shippingInfo = $this->createMock(ShippingInfo::class);
         $account = $this->createMock(Account::class);
+        $shippingInfo = $this->createPartialMock(ShippingInfo::class, ['getAccount']);
 
-        // 设置预期行为
         $shippingInfo->expects($this->once())
             ->method('getAccount')
-            ->willReturn($account);
-            
-        // 验证请求创建和调用
-        $this->client->expects($this->once())
+            ->willReturn($account)
+        ;
+
+        // Assert
+        $client->expects($this->once())
             ->method('asyncRequest')
-            ->with($this->callback(function (UploadShippingInfoRequest $request) use ($account, $shippingInfo) {
-                $this->assertSame($account, $request->getAccount());
-                $this->assertSame($shippingInfo, $request->getShippingInfo());
-                return true;
-            }));
-            
-        // 执行测试
-        $this->listener->prePersist($shippingInfo);
+            ->with(self::callback(function ($request) use ($account, $shippingInfo) {
+                if (!($request instanceof UploadShippingInfoRequest)) {
+                    return false;
+                }
+
+                return $request->getAccount() === $account
+                    && $request->getShippingInfo() === $shippingInfo;
+            }))
+        ;
+
+        // Act
+        $listener->prePersist($shippingInfo);
     }
-    
-    public function testPrePersistWithNullAccount(): void
+
+    public function testPrePersistShouldIgnoreErrorWhenAccountNotInitialized(): void
     {
-        // 由于 ShippingInfo::getAccount 方法返回的是非空的 Account 对象
-        // 所以这个测试用例不再适用，我们改为测试 asyncRequest 方法调用
-        
-        // 准备测试数据
-        $shippingInfo = $this->createMock(ShippingInfo::class);
-        $account = $this->createMock(Account::class);
-        
-        // 设置预期行为
+        // Arrange
+        $client = $this->createMock(Client::class);
+        $listener = new ShippingInfoListener($client);
+
+        $shippingInfo = $this->createPartialMock(ShippingInfo::class, ['getAccount']);
+
+        // Simulate \Error when accessing uninitialized account property
         $shippingInfo->expects($this->once())
             ->method('getAccount')
-            ->willReturn($account);
-            
-        // 验证请求创建和调用
-        $this->client->expects($this->once())
+            ->willThrowException(new \Error('Typed property must not be accessed before initialization'))
+        ;
+
+        // Assert - client should not be called when Error occurs
+        $client->expects($this->never())
             ->method('asyncRequest')
-            ->with($this->isInstanceOf(UploadShippingInfoRequest::class));
-            
-        // 执行测试
-        $this->listener->prePersist($shippingInfo);
+        ;
+
+        // Act - should not throw exception due to Error handling
+        $listener->prePersist($shippingInfo);
+
+        // The test implicitly passes if no exception is thrown
+    }
+
+    public function testPrePersistShouldPropagateOtherExceptions(): void
+    {
+        // Arrange
+        $client = $this->createMock(Client::class);
+        $listener = new ShippingInfoListener($client);
+
+        $shippingInfo = $this->createPartialMock(ShippingInfo::class, ['getAccount']);
+
+        // Simulate other exception (not \Error)
+        $shippingInfo->expects($this->once())
+            ->method('getAccount')
+            ->willThrowException(new \RuntimeException('Some other error'))
+        ;
+
+        // Assert - client should not be called when exception occurs
+        $client->expects($this->never())
+            ->method('asyncRequest')
+        ;
+
+        // Act & Assert - should propagate RuntimeException
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Some other error');
+
+        $listener->prePersist($shippingInfo);
     }
 }

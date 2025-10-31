@@ -4,7 +4,21 @@ services:
     autowire: true      # Automatically injects dependencies in your services.
     autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-  WechatMiniProgramOrderBundle\EventSubscriber\:
-    resource: '../../EventSubscriber/'
+  WechatMiniProgramOrderBundle\Controller\:
+    resource: '../../Controller/'
+    tags: ['controller.service_arguments']
+
+  WechatMiniProgramOrderBundle\Service\:
+    resource: '../../Service/'
+
   WechatMiniProgramOrderBundle\Repository\:
     resource: '../../Repository/'
+
+  WechatMiniProgramOrderBundle\EventSubscriber\:
+    resource: '../../EventSubscriber/'
+
+when@test:
+  services:
+    WechatMiniProgramBundle\Service\Client:
+      public: true
+

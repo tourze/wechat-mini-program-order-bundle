@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramOrderBundle\Enum;
 
 use Tourze\EnumExtra\Itemable;
@@ -15,12 +17,12 @@ use Tourze\EnumExtra\SelectTrait;
  * 3. VIRTUAL_GOODS - 虚拟商品，例如话费充值，点卡等，无实体配送形式
  * 4. SELF_PICKUP - 用户自提
  */
-enum LogisticsType: int
- implements Itemable, Labelable, Selectable{
-    
+enum LogisticsType: int implements Itemable, Labelable, Selectable
+{
     use ItemTrait;
     use SelectTrait;
-/**
+
+    /**
      * 实体物流配送
      */
     case PHYSICAL_LOGISTICS = 1;
@@ -42,9 +44,11 @@ enum LogisticsType: int
 
     public function getLabel(): string
     {
-        return match($this) {
-            // TODO: 添加具体的标签映射
-            default => $this->name,
+        return match ($this) {
+            self::PHYSICAL_LOGISTICS => '实体物流配送',
+            self::LOCAL_DELIVERY => '同城配送',
+            self::VIRTUAL_GOODS => '虚拟商品',
+            self::SELF_PICKUP => '用户自提',
         };
     }
 }

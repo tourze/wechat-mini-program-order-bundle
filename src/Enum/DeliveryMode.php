@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatMiniProgramOrderBundle\Enum;
 
 use Tourze\EnumExtra\Itemable;
@@ -13,12 +15,12 @@ use Tourze\EnumExtra\SelectTrait;
  * 1. UNIFIED_DELIVERY（统一发货）
  * 2. SPLIT_DELIVERY（分拆发货）
  */
-enum DeliveryMode: string
- implements Itemable, Labelable, Selectable{
-    
+enum DeliveryMode: string implements Itemable, Labelable, Selectable
+{
     use ItemTrait;
     use SelectTrait;
-/**
+
+    /**
      * 统一发货
      */
     case UNIFIED_DELIVERY = 'unified_delivery';
@@ -30,9 +32,9 @@ enum DeliveryMode: string
 
     public function getLabel(): string
     {
-        return match($this) {
-            // TODO: 添加具体的标签映射
-            default => $this->name,
+        return match ($this) {
+            self::UNIFIED_DELIVERY => '统一发货',
+            self::SPLIT_DELIVERY => '分拆发货',
         };
     }
 }
