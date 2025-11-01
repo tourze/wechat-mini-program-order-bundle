@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace WechatMiniProgramOrderBundle\Tests\Request;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use HttpClientBundle\Tests\Request\RequestTestCase;
+use HttpClientBundle\Test\RequestTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Tourze\WechatMiniProgramUserContracts\UserInterface;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramOrderBundle\Entity\OrderKey;
