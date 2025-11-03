@@ -9,6 +9,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Tourze\BundleDependency\BundleDependencyInterface;
 use WechatMiniProgramAuthBundle\WechatMiniProgramAuthBundle;
 use WechatMiniProgramBundle\WechatMiniProgramBundle;
+use Tourze\EasyAdminMenuBundle\EasyAdminMenuBundle;
 
 class WechatMiniProgramOrderBundle extends Bundle implements BundleDependencyInterface
 {
@@ -18,6 +19,7 @@ class WechatMiniProgramOrderBundle extends Bundle implements BundleDependencyInt
             DoctrineBundle::class => ['all' => true],
             WechatMiniProgramBundle::class => ['all' => true],
             WechatMiniProgramAuthBundle::class => ['all' => true],
+            EasyAdminMenuBundle::class => ['all' => true],
         ];
     }
 }
