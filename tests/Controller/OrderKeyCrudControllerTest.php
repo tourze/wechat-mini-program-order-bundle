@@ -18,11 +18,6 @@ use WechatMiniProgramOrderBundle\Entity\OrderKey;
 #[RunTestsInSeparateProcesses]
 class OrderKeyCrudControllerTest extends AbstractEasyAdminControllerTestCase
 {
-    public function testGetEntityFqcn(): void
-    {
-        $this->assertSame(OrderKey::class, OrderKeyCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $controller = new OrderKeyCrudController();

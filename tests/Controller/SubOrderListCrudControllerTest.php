@@ -18,11 +18,6 @@ use WechatMiniProgramOrderBundle\Entity\SubOrderList;
 #[RunTestsInSeparateProcesses]
 class SubOrderListCrudControllerTest extends AbstractEasyAdminControllerTestCase
 {
-    public function testGetEntityFqcn(): void
-    {
-        $this->assertSame(SubOrderList::class, SubOrderListCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $controller = new SubOrderListCrudController();

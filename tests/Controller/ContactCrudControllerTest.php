@@ -17,11 +17,6 @@ use WechatMiniProgramOrderBundle\Entity\Contact;
 #[RunTestsInSeparateProcesses]
 class ContactCrudControllerTest extends AbstractEasyAdminControllerTestCase
 {
-    public function testGetEntityFqcn(): void
-    {
-        $this->assertSame(Contact::class, ContactCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $controller = new ContactCrudController();

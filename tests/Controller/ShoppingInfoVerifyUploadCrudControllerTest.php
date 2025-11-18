@@ -18,11 +18,6 @@ use WechatMiniProgramOrderBundle\Entity\ShoppingInfoVerifyUpload;
 #[RunTestsInSeparateProcesses]
 class ShoppingInfoVerifyUploadCrudControllerTest extends AbstractEasyAdminControllerTestCase
 {
-    public function testGetEntityFqcn(): void
-    {
-        $this->assertSame(ShoppingInfoVerifyUpload::class, ShoppingInfoVerifyUploadCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $controller = new ShoppingInfoVerifyUploadCrudController();

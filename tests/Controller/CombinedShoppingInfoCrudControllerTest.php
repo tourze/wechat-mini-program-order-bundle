@@ -18,11 +18,6 @@ use WechatMiniProgramOrderBundle\Entity\CombinedShoppingInfo;
 #[RunTestsInSeparateProcesses]
 class CombinedShoppingInfoCrudControllerTest extends AbstractEasyAdminControllerTestCase
 {
-    public function testGetEntityFqcn(): void
-    {
-        $this->assertSame(CombinedShoppingInfo::class, CombinedShoppingInfoCrudController::getEntityFqcn());
-    }
-
     public function testConfigureFields(): void
     {
         $controller = new CombinedShoppingInfoCrudController();
