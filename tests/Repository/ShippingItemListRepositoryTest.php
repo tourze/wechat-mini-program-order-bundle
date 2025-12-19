@@ -7,6 +7,7 @@ namespace WechatMiniProgramOrderBundle\Tests\Repository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\PHPUnitSymfonyKernelTest\AbstractRepositoryTestCase;
+use Tourze\WechatMiniProgramAppIDContracts\MiniProgramInterface;
 use Tourze\WechatMiniProgramUserContracts\UserInterface;
 use WechatMiniProgramAuthBundle\Entity\User;
 use WechatMiniProgramBundle\Entity\Account;
@@ -61,7 +62,13 @@ final class ShippingItemListRepositoryTest extends AbstractRepositoryTestCase
         self::getEntityManager()->persist($account);
 
         // 创建User并持久化
-        $user = $this->createTestUser($account);
+        $user = new User();
+        $user->setOpenId('test_user_id_' . uniqid());
+        $user->setUnionId('test_union_id_' . uniqid());
+        $user->setAvatarUrl('https://example.com/avatar.jpg');
+        if ($account !== null) {
+            $user->setAccount($account);
+        }
         self::getEntityManager()->persist($user);
 
         // 创建OrderKey并持久化
@@ -109,7 +116,11 @@ final class ShippingItemListRepositoryTest extends AbstractRepositoryTestCase
     {
         // 创建共享的基础数据
         $account = $this->createTestAccount();
-        $user = $this->createTestUser($account);
+        $user = new User();
+        $user->setOpenId('test_user_id_' . uniqid());
+        $user->setUnionId('test_union_id_' . uniqid());
+        $user->setAvatarUrl('https://example.com/avatar.jpg');
+        $user->setAccount($account);
         $orderKey1 = $this->createTestOrderKey();
         $orderKey2 = $this->createTestOrderKey();
         self::getEntityManager()->persist($account);
@@ -232,7 +243,11 @@ final class ShippingItemListRepositoryTest extends AbstractRepositoryTestCase
     {
         // 创建完整的实体层次结构
         $account = $this->createTestAccount();
-        $user = $this->createTestUser($account);
+        $user = new User();
+        $user->setOpenId('test_user_id_' . uniqid());
+        $user->setUnionId('test_union_id_' . uniqid());
+        $user->setAvatarUrl('https://example.com/avatar.jpg');
+        $user->setAccount($account);
         $orderKey1 = $this->createTestOrderKey();
         $orderKey2 = $this->createTestOrderKey();
 
@@ -399,7 +414,11 @@ final class ShippingItemListRepositoryTest extends AbstractRepositoryTestCase
     {
         // 创建共享的基础数据
         $account = $this->createTestAccount();
-        $user = $this->createTestUser($account);
+        $user = new User();
+        $user->setOpenId('test_user_id_' . uniqid());
+        $user->setUnionId('test_union_id_' . uniqid());
+        $user->setAvatarUrl('https://example.com/avatar.jpg');
+        $user->setAccount($account);
         $orderKey1 = $this->createTestOrderKey();
         $orderKey2 = $this->createTestOrderKey();
         self::getEntityManager()->persist($account);
@@ -464,7 +483,8 @@ final class ShippingItemListRepositoryTest extends AbstractRepositoryTestCase
 
         $user = new User();
         $user->setOpenId('test_user_id_' . uniqid());
-        $user->setAccount($account);
+        $user->setUnionId('test_union_id_' . uniqid());
+        $user->setAvatarUrl('https://example.com/avatar.jpg');
 
         $orderKey1 = new OrderKey();
         $orderKey1->setOrderNumberType(OrderNumberType::USE_MCH_ORDER);
@@ -518,23 +538,7 @@ final class ShippingItemListRepositoryTest extends AbstractRepositoryTestCase
         return $account;
     }
 
-    /**
-     * 创建微信小程序用户实体（非系统BizUser）
-     * 这个方法专门用于创建WechatMiniProgramAuthBundle\Entity\User实体，
-     * 与系统的BizUser不同，需要设置openId、unionId等微信特有属性
-     * @phpstan-ignore-next-line PreferInterfaceStubTraitRule.createTestUser
-     */
-    private function createTestUser(?Account $account = null): UserInterface
-    {
-        $user = new User();
-        $user->setOpenId('test_user_id_' . uniqid());
-        $user->setUnionId('test_union_id_' . uniqid());
-        $user->setAvatarUrl('https://example.com/avatar.jpg');
-        $user->setAccount($account ?? $this->createTestAccount());
-
-        return $user;
-    }
-
+      
     private function createTestOrderKey(): OrderKey
     {
         $orderKey = new OrderKey();

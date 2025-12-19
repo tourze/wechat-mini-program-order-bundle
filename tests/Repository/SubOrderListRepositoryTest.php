@@ -7,6 +7,7 @@ namespace WechatMiniProgramOrderBundle\Tests\Repository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\PHPUnitSymfonyKernelTest\AbstractRepositoryTestCase;
+use Tourze\WechatMiniProgramAppIDContracts\MiniProgramInterface;
 use Tourze\WechatMiniProgramUserContracts\UserInterface;
 use WechatMiniProgramAuthBundle\Entity\User;
 use WechatMiniProgramBundle\Entity\Account;
@@ -46,7 +47,10 @@ final class SubOrderListRepositoryTest extends AbstractRepositoryTestCase
         // 创建测试用的基础数据，按依赖顺序
         $this->testAccount = $this->createTestAccount();
         $this->testOrderKey = $this->createTestOrderKey();
-        $this->testUser = $this->createTestUser($this->testAccount);
+        $this->testUser = new User();
+        $this->testUser->setOpenId('test_user_id_' . uniqid());
+        $this->testUser->setUnionId('test_union_id_' . uniqid());
+        $this->testUser->setAvatarUrl('https://example.com/avatar.jpg');
         $this->testCombinedShippingInfo = $this->createTestCombinedShippingInfo($this->testAccount, $this->testOrderKey, $this->testUser);
 
         $this->persistAndFlush($this->testAccount);
@@ -64,23 +68,7 @@ final class SubOrderListRepositoryTest extends AbstractRepositoryTestCase
         return $account;
     }
 
-    /**
-     * 创建微信小程序用户实体（非系统BizUser）
-     * 这个方法专门用于创建WechatMiniProgramAuthBundle\Entity\User实体，
-     * 与系统的BizUser不同，需要设置openId、unionId等微信特有属性
-     * @phpstan-ignore-next-line PreferInterfaceStubTraitRule.createTestUser
-     */
-    private function createTestUser(?Account $account = null): UserInterface
-    {
-        $user = new User();
-        $user->setOpenId('test_user_id_' . uniqid());
-        $user->setUnionId('test_union_id_' . uniqid());
-        $user->setAvatarUrl('https://example.com/avatar.jpg');
-        $user->setAccount($account ?? $this->testAccount);
-
-        return $user;
-    }
-
+    
     private function createTestOrderKey(): OrderKey
     {
         $orderKey = new OrderKey();
@@ -780,6 +768,7 @@ final class SubOrderListRepositoryTest extends AbstractRepositoryTestCase
         return $entity;
     }
 
+    
     protected function getRepository(): SubOrderListRepository
     {
         return self::getService(SubOrderListRepository::class);

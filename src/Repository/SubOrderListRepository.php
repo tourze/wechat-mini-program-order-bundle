@@ -14,7 +14,7 @@ use WechatMiniProgramOrderBundle\Enum\DeliveryMode;
  * @extends ServiceEntityRepository<SubOrderList>
  */
 #[AsRepository(entityClass: SubOrderList::class)]
-class SubOrderListRepository extends ServiceEntityRepository
+final class SubOrderListRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

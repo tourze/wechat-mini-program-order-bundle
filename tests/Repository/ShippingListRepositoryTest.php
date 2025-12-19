@@ -7,6 +7,7 @@ namespace WechatMiniProgramOrderBundle\Tests\Repository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Tourze\PHPUnitSymfonyKernelTest\AbstractRepositoryTestCase;
+use Tourze\WechatMiniProgramAppIDContracts\MiniProgramInterface;
 use Tourze\WechatMiniProgramUserContracts\UserInterface;
 use WechatMiniProgramAuthBundle\Entity\User;
 use WechatMiniProgramBundle\Entity\Account;
@@ -71,7 +72,10 @@ final class ShippingListRepositoryTest extends AbstractRepositoryTestCase
     ): ShippingList {
         // 创建必要的相关实体
         $account = $this->createTestAccount();
-        $user = $this->createTestUser();
+        $user = new User();
+        $user->setOpenId('test_user_id_' . uniqid());
+        $user->setUnionId('test_union_id_' . uniqid());
+        $user->setAvatarUrl('https://example.com/avatar.jpg');
         $orderKey = $this->createTestOrderKey($orderId);
         $combinedShippingInfo = $this->createTestCombinedShippingInfo($account, $orderKey, $user);
 
@@ -121,22 +125,7 @@ final class ShippingListRepositoryTest extends AbstractRepositoryTestCase
         return $account;
     }
 
-    /**
-     * 创建微信小程序用户实体（非系统BizUser）
-     * 这个方法专门用于创建WechatMiniProgramAuthBundle\Entity\User实体，
-     * 与系统的BizUser不同，需要设置openId、unionId等微信特有属性
-     * @phpstan-ignore-next-line PreferInterfaceStubTraitRule.createTestUser
-     */
-    private function createTestUser(): UserInterface
-    {
-        $user = new User();
-        $user->setOpenId('test_user_id_' . uniqid());
-        $user->setUnionId('test_union_id_' . uniqid());
-        $user->setAvatarUrl('https://example.com/avatar.jpg');
-
-        return $user;
-    }
-
+  
     private function createTestOrderKey(string $orderId): OrderKey
     {
         $orderKey = new OrderKey();
@@ -280,7 +269,10 @@ final class ShippingListRepositoryTest extends AbstractRepositoryTestCase
 
         // 创建一个新的 ShippingList 来测试保存但不刷新的功能
         $account = $this->createTestAccount();
-        $user = $this->createTestUser();
+        $user = new User();
+        $user->setOpenId('test_user_id_' . uniqid());
+        $user->setUnionId('test_union_id_' . uniqid());
+        $user->setAvatarUrl('https://example.com/avatar.jpg');
         $orderKey = $this->createTestOrderKey('TEST_NO_FLUSH_2');
         $combinedShippingInfo = $this->createTestCombinedShippingInfo($account, $orderKey, $user);
 
@@ -499,6 +491,7 @@ final class ShippingListRepositoryTest extends AbstractRepositoryTestCase
         return $shippingList;
     }
 
+    
     protected function getRepository(): ShippingListRepository
     {
         $repository = self::getEntityManager()->getRepository(ShippingList::class);

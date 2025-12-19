@@ -11,7 +11,7 @@ use WechatMiniProgramOrderBundle\Entity\ShoppingInfo;
 use WechatMiniProgramOrderBundle\Request\UploadShoppingInfoRequest;
 
 #[AsEntityListener(event: Events::prePersist, method: 'prePersist', entity: ShoppingInfo::class)]
-class ShoppingInfoListener
+final class ShoppingInfoListener
 {
     public function __construct(
         private readonly Client $client,

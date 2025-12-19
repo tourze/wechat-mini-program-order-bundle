@@ -14,7 +14,7 @@ use WechatMiniProgramOrderBundle\Enum\ShoppingInfoVerifyStatus;
  * @extends ServiceEntityRepository<ShoppingInfoVerifyUpload>
  */
 #[AsRepository(entityClass: ShoppingInfoVerifyUpload::class)]
-class ShoppingInfoVerifyUploadRepository extends ServiceEntityRepository
+final class ShoppingInfoVerifyUploadRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

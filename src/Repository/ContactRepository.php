@@ -13,7 +13,7 @@ use WechatMiniProgramOrderBundle\Entity\Contact;
  * @extends ServiceEntityRepository<Contact>
  */
 #[AsRepository(entityClass: Contact::class)]
-class ContactRepository extends ServiceEntityRepository
+final class ContactRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

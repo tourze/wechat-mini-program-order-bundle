@@ -6,26 +6,35 @@ namespace WechatMiniProgramOrderBundle\Tests\EventSubscriber;
 
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Tourze\PHPUnitSymfonyKernelTest\AbstractEventSubscriberTestCase;
 use WechatMiniProgramBundle\Entity\Account;
 use WechatMiniProgramBundle\Service\Client;
 use WechatMiniProgramOrderBundle\Entity\ShippingInfo;
 use WechatMiniProgramOrderBundle\EventSubscriber\ShippingInfoListener;
 use WechatMiniProgramOrderBundle\Request\UploadShippingInfoRequest;
 
-/**
- * @internal
- * @phpstan-ignore-next-line tourze.serviceTestShouldExtendIntegrationTestCase
- */
+
 #[CoversClass(ShippingInfoListener::class)]
-final class ShippingInfoListenerTest extends TestCase
+#[RunTestsInSeparateProcesses]
+final class ShippingInfoListenerTest extends AbstractEventSubscriberTestCase
 {
+    private Client $client;
+
+    protected function onSetUp(): void
+    {
+        $this->client = $this->createMock(Client::class);
+
+        // 注入 Mock 客户端到容器
+        self::getContainer()->set(Client::class, $this->client);
+    }
+
     public function testPrePersistShouldCreateRequestAndCallAsyncRequestWithCorrectData(): void
     {
-        // Arrange
-        $client = $this->createMock(Client::class);
-        $listener = new ShippingInfoListener($client);
+        // 从容器中获取监听器实例
+        $listener = self::getService(ShippingInfoListener::class);
 
+        // Arrange
         $account = $this->createMock(Account::class);
         $shippingInfo = $this->createPartialMock(ShippingInfo::class, ['getAccount']);
 
@@ -35,7 +44,7 @@ final class ShippingInfoListenerTest extends TestCase
         ;
 
         // Assert
-        $client->expects($this->once())
+        $this->client->expects($this->once())
             ->method('asyncRequest')
             ->with(self::callback(function ($request) use ($account, $shippingInfo) {
                 if (!($request instanceof UploadShippingInfoRequest)) {
@@ -53,10 +62,10 @@ final class ShippingInfoListenerTest extends TestCase
 
     public function testPrePersistShouldIgnoreErrorWhenAccountNotInitialized(): void
     {
-        // Arrange
-        $client = $this->createMock(Client::class);
-        $listener = new ShippingInfoListener($client);
+        // 从容器中获取监听器实例
+        $listener = self::getService(ShippingInfoListener::class);
 
+        // Arrange
         $shippingInfo = $this->createPartialMock(ShippingInfo::class, ['getAccount']);
 
         // Simulate \Error when accessing uninitialized account property
@@ -66,7 +75,7 @@ final class ShippingInfoListenerTest extends TestCase
         ;
 
         // Assert - client should not be called when Error occurs
-        $client->expects($this->never())
+        $this->client->expects($this->never())
             ->method('asyncRequest')
         ;
 
@@ -78,10 +87,10 @@ final class ShippingInfoListenerTest extends TestCase
 
     public function testPrePersistShouldPropagateOtherExceptions(): void
     {
-        // Arrange
-        $client = $this->createMock(Client::class);
-        $listener = new ShippingInfoListener($client);
+        // 从容器中获取监听器实例
+        $listener = self::getService(ShippingInfoListener::class);
 
+        // Arrange
         $shippingInfo = $this->createPartialMock(ShippingInfo::class, ['getAccount']);
 
         // Simulate other exception (not \Error)
@@ -91,7 +100,7 @@ final class ShippingInfoListenerTest extends TestCase
         ;
 
         // Assert - client should not be called when exception occurs
-        $client->expects($this->never())
+        $this->client->expects($this->never())
             ->method('asyncRequest')
         ;
 

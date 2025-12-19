@@ -55,11 +55,8 @@ final class ShippingListTest extends AbstractEntityTestCase
     {
         $this->assertNull($this->shippingList->getSubOrder());
 
-        // 使用具体类 SubOrderList 是必要的，理由1：
-        // 1. SubOrderList 是 Doctrine 实体，没有对应的接口，创建接口会增加不必要的复杂性
-        // 使用具体类 具体类名 是必要的，理由2：测试需要验证实体间关系的设置和获取，Mock 提供精确的测试控制
-        // 使用具体类 具体类名 是必要的，理由3：单元测试需要隔离外部依赖，使用 Mock 是标准做法
-        $subOrder = $this->createMock(SubOrderList::class);
+        // 使用真实的 SubOrderList 实体，避免 Mock
+        $subOrder = new SubOrderList();
         $this->shippingList->setSubOrder($subOrder);
         $this->assertSame($subOrder, $this->shippingList->getSubOrder());
     }
@@ -91,11 +88,8 @@ final class ShippingListTest extends AbstractEntityTestCase
 
     public function testAddItemList(): void
     {
-        // 使用具体类 ShippingItemList 是必要的，理由1：
-        // 1. ShippingItemList 是 Doctrine 实体，没有对应的接口，创建接口会增加不必要的复杂性
-        // 使用具体类 具体类名 是必要的，理由2：测试需要验证集合操作，Mock 能精确控制方法行为
-        // 使用具体类 具体类名 是必要的，理由3：单元测试需要隔离外部依赖，使用 Mock 是标准做法
-        $itemList = $this->createMock(ShippingItemList::class);
+        // 使用真实的 ShippingItemList 实体，避免 Mock
+        $itemList = new ShippingItemList();
 
         $this->shippingList->addItemList($itemList);
 
@@ -104,11 +98,8 @@ final class ShippingListTest extends AbstractEntityTestCase
 
     public function testRemoveItemList(): void
     {
-        // 使用具体类 ShippingItemList 是必要的，理由1：
-        // 1. ShippingItemList 是 Doctrine 实体，没有对应的接口，创建接口会增加不必要的复杂性
-        // 使用具体类 具体类名 是必要的，理由2：测试需要验证实体移除操作，Mock 能精确控制方法行为
-        // 使用具体类 具体类名 是必要的，理由3：单元测试需要隔离外部依赖，使用 Mock 是标准做法
-        $itemList = $this->createMock(ShippingItemList::class);
+        // 使用真实的 ShippingItemList 实体，避免 Mock
+        $itemList = new ShippingItemList();
 
         $this->shippingList->addItemList($itemList);
         $this->shippingList->removeItemList($itemList);
@@ -120,11 +111,8 @@ final class ShippingListTest extends AbstractEntityTestCase
     {
         $this->assertNull($this->shippingList->getContact());
 
-        // 使用具体类 Contact 是必要的，理由1：
-        // 1. Contact 是 Doctrine 实体，没有对应的接口，创建接口会增加不必要的复杂性
-        // 使用具体类 具体类名 是必要的，理由2：测试需要验证实体间关系的设置和获取，Mock 提供精确的测试控制
-        // 使用具体类 具体类名 是必要的，理由3：单元测试需要隔离外部依赖，使用 Mock 是标准做法
-        $contact = $this->createMock(Contact::class);
+        // 使用真实的 Contact 实体，避免 Mock
+        $contact = new Contact();
         $this->shippingList->setContact($contact);
         $this->assertSame($contact, $this->shippingList->getContact());
     }

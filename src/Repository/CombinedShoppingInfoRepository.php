@@ -13,7 +13,7 @@ use WechatMiniProgramOrderBundle\Entity\CombinedShoppingInfo;
  * @extends ServiceEntityRepository<CombinedShoppingInfo>
  */
 #[AsRepository(entityClass: CombinedShoppingInfo::class)]
-class CombinedShoppingInfoRepository extends ServiceEntityRepository
+final class CombinedShoppingInfoRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

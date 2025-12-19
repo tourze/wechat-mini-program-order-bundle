@@ -33,14 +33,14 @@ class AdminMenuTest extends AbstractEasyAdminMenuTestCase
     public function testInvokeAddsMenuItems(): void
     {
         $rootItem = $this->createMock(ItemInterface::class);
+
+        // 简化 Mock 设置，只测试核心功能不抛出异常
+        $rootItem->expects($this->atLeastOnce())
+            ->method('getChild')
+            ->willReturn(null)
+        ;
+
         $wechatMenu = $this->createMock(ItemInterface::class);
-
-        // Just test that it can be called without errors
-        $rootItem->expects($this->atLeastOnce())
-            ->method('getChild')
-            ->willReturn(null)
-        ;
-
         $rootItem->expects($this->atLeastOnce())
             ->method('addChild')
             ->willReturn($wechatMenu)
@@ -53,25 +53,15 @@ class AdminMenuTest extends AbstractEasyAdminMenuTestCase
 
         $wechatMenu->expects($this->any())
             ->method('addChild')
-            ->willReturn($wechatMenu)
-        ;
-
-        $wechatMenu->expects($this->any())
-            ->method('setAttribute')
-            ->willReturn($wechatMenu)
-        ;
-
-        $wechatMenu->expects($this->any())
-            ->method('setUri')
             ->willReturn($wechatMenu)
         ;
 
         $adminMenu = static::getService(AdminMenu::class);
 
-        // Simply test that invoke doesn't throw an exception
+        // 测试菜单添加功能不抛出异常
         $adminMenu($rootItem);
 
-        // Basic assertion to avoid risky test warning
+        // 基本断言避免风险测试警告
         $this->assertInstanceOf(AdminMenu::class, $adminMenu);
     }
 

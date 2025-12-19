@@ -13,7 +13,7 @@ use WechatMiniProgramOrderBundle\Request\UploadShippingInfoRequest;
 
 #[AsEntityListener(event: Events::prePersist, method: 'prePersist', entity: ShippingInfo::class)]
 #[Autoconfigure(public: true)]
-class ShippingInfoListener
+final class ShippingInfoListener
 {
     public function __construct(
         private readonly Client $client,

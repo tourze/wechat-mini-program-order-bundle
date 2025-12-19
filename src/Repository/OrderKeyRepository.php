@@ -13,7 +13,7 @@ use WechatMiniProgramOrderBundle\Entity\OrderKey;
  * @extends ServiceEntityRepository<OrderKey>
  */
 #[AsRepository(entityClass: OrderKey::class)]
-class OrderKeyRepository extends ServiceEntityRepository
+final class OrderKeyRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
